@@ -1,85 +1,89 @@
-# NAM FORGE · Zoom MultiStomp ZDL 工作台
+# NAM FORGE · Zoom MultiStomp ZDL Workbench
 
-把 NAM（Neural Amp Modeler）捕捉批量转成 Zoom MultiStomp 的 `.ZDL` 效果，并给踏板做 128×64 单色封面。
+[English](README.md) · [中文](README.zh-CN.md)
 
-纯前端、离线运行：文件只在浏览器里处理，不上传。
+Turn NAM (Neural Amp Modeler) captures into Zoom MultiStomp `.ZDL` effects, and design 128×64 1-bit covers for the pedal.
 
-![批量转换](preview-batch.png)
-![封面设计](preview-design.png)
-![导入图片](preview-import.png)
+Runs entirely in the browser. Files never leave your machine.
 
-## 封面作品
+![Batch conversion](preview-batch.png)
+![Cover designer](preview-design.png)
+![Image import](preview-import.png)
 
-用「导入图片」把原图转成 128×64 踏板封面的效果（示例短名 `AC30C`）：
+> The app UI is Chinese-first. This README is in English.
+
+## Cover gallery
+
+Examples made by importing artwork into NAM FORGE (sample short name `AC30C`):
 
 <p align="center">
-  <img src="covers/ac30c-tree.png" width="320" alt="AC30C 树">
-  <img src="covers/ac30c-face.png" width="320" alt="AC30C 人像">
+  <img src="covers/ac30c-tree.png" width="320" alt="AC30C tree cover">
+  <img src="covers/ac30c-face.png" width="320" alt="AC30C portrait cover">
   <br>
-  <img src="covers/ac30c-skull.png" width="320" alt="AC30C 骷髅">
-  <img src="covers/ac30c-wave.png" width="320" alt="AC30C 波纹">
+  <img src="covers/ac30c-skull.png" width="320" alt="AC30C skull cover">
+  <img src="covers/ac30c-wave.png" width="320" alt="AC30C wave cover">
 </p>
 
-图源：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)。原图版权归原作者，这里仅作 NAM FORGE 的 1-bit 导入效果展示，未经原作者许可请勿商用。
+Artwork source: Bilibili [@__米粥__, “这个月的一些零图” (Some sketches from this month)](https://www.bilibili.com/opus/1208525001677864960). Copyright belongs to the original artist. Shown here only as 1-bit import examples; do not use commercially without the artist's permission.
 
-## 功能
+## Features
 
-- **批量转换**：一次拖入多个 `.nam`，自动识别 A2 Lite（SlimmableContainer 内的 3 声道 WaveNet），分配短名和槽位，导出 ZIP（`.ZDL` + 同名 `.png` + `.json`）。
-- **换封面**：拖入已有的 `.ZDL`，只改写 1,024 B 封面区和 12 B 显示名；权重、FXID、版本号原样保留（已做逐字节差异验证）。
-- **封面设计**：128×64 单色；默认「纯文字 · 浅底」+ 1 px 小字；预设、手绘、反相、清空。原版踏板默认不画名字，需要时勾选「显示名字」。
-- **导入图片**：半实心 / 半网点混合（默认，网点量可调）、纯网点、实心、线条；缩放 25–400%、X/Y 移动，或选「移动」工具直接拖。
-- **文字**：可开关、小字 / 大字、X/Y 移动或「移字」拖动；底板 / 描边可选。
-- **导入 / 导出**：封面导出 128×64 PNG；设计导出 / 导入 JSON（底图 + 文字位置 / 字号 / 开关），换电脑也能接着改。
-- 引擎 **0.26**，**216** 个 capture 槽位，full rate 每块 **194 DSP**。
+- **Batch conversion** — drop multiple `.nam` files; the app detects A2 Lite models (3-channel WaveNet inside a SlimmableContainer), assigns short names and slots, and exports a ZIP with `.ZDL` + matching `.png` + `.json` notes.
+- **Re-cover** — drop existing `.ZDL` files; only the 1,024 B picture area and 12 B display name are rewritten. Weights, FXID and version are left untouched (byte-diff verified).
+- **Cover designer** — 128×64 1-bit; default “plain text on light” with 1 px small text; presets, freehand drawing, invert, clear. The “original pedal” preset draws no name by default; enable “show name” if you want it.
+- **Image import** — half-solid / half-dither hybrid (default, dot amount adjustable), pure dither, solid, or line/edge mode; scale 25–400%, X/Y offset, or drag with the Move tool.
+- **Text** — show/hide, small 1 px or large, X/Y offset or drag with the Move-text tool; optional plate and outline.
+- **Import / export** — export the cover as a 128×64 PNG; export/import the full design as JSON (bitmap + text position/size/toggles), so you can continue on another machine.
+- Engine **0.26**, **216** capture slots, **194 DSP** per full-rate capture.
 
-## 快速开始
+## Quick start
 
-1. 下载或克隆本仓库，用 Chrome / Edge 打开 `index.html`。
-2. 不需要服务器、不联网；文件只在本地浏览器处理。
-3. 也可以直接访问 GitHub Pages：<https://zisonzishen0415-stack.github.io/nam-forge/>
+1. Download or clone this repo and open `index.html` in Chrome or Edge.
+2. No server, no network: files are processed locally in the browser.
+3. Or use the GitHub Pages build: <https://zisonzishen0415-stack.github.io/nam-forge/>
 
-## 转换
+## Convert
 
-1. 「批量转换」→ 拖入多个 `.nam`。
-2. 起始槽位默认 **40**，可逐行改短名 / 槽位；界面里能改成 1–216 任意值。
-3. 「转换全部」→「下载 ZIP」。
-4. ZIP 里每个 capture 有 `NAM<槽位><短名>.ZDL`、同名 `.png`（Effect Manager 缩略图）和 `NAMLite-<短名>.json`（转换记录）。
+1. **Batch** → drop multiple `.nam` files.
+2. Start slot defaults to **40** and can be changed per row (any value 1–216).
+3. **Convert all** → **Download ZIP**.
+4. Each capture gets `NAM<slot><shortname>.ZDL`, a matching `.png` (Effect Manager thumbnail), and `NAMLite-<shortname>.json` (conversion notes).
 
-## 换封面
+## Re-cover
 
-1. 「换封面」→ 拖入已生成的 `.ZDL`（0.26 模板）。
-2. 可改显示名、选择封面；「应用封面」。
-3. 只改动封面区和显示名，音色数据不动。
+1. **Re-cover** → drop existing `.ZDL` files (0.26 templates).
+2. Edit the display name and pick a cover; click **Apply cover**.
+3. Only the cover area and display name change; the amp model data is untouched.
 
-## 安装到踏板
+## Install on the pedal
 
-- 用 **Zoom Effect Manager 2.3.3+** → Settings → Read Effects from folder → From Folder，指向解压后的目录。
-- `.ZDL` 和同名 `.png` 必须放在一起；**不要改文件名**（踏板只认前 8 个字符，重名会死机）。
-- 只适用于原版 MultiStomp（MS-50G / MS-60B / MS-70CDR）；不支持 "+" 系列和 Four 系列。
-- 安装前备份踏板。一个 full-rate capture 占 194 DSP，多个同时开通常装不下。
-- 如果踏板卡住：拔电，按住 Up + Down 插 USB 进升级模式，用 Effect Manager 删除最后安装的文件；最后手段 `All INITIALIZE` 会清空 patch。
+- Use **Zoom Effect Manager 2.3.3+** → Settings → Read Effects from folder → From Folder, pointing at the extracted folder.
+- The `.ZDL` and matching `.png` must sit together; **do not rename them** (the pedal only keeps the first 8 characters of the basename, and duplicate names can freeze it).
+- Original MultiStomp only: **MS-50G / MS-60B / MS-70CDR**. The “+” models (MS-50G+, MS-60B+, MS-70CDR+) and the Four series are not supported.
+- Back up your patches first. A full-rate capture declares 194 DSP; several captures usually cannot run at once.
+- If the pedal freezes: unplug it, hold **Up + Down** while plugging in USB to enter update mode, then delete the last installed effect with Effect Manager. As a last resort, `All INITIALIZE` erases all patches.
 
-## 技术说明
+## Technical notes
 
-- 封面：128×64、1-bit、Zoom 列优先 RLE，容量 1,024 B。
-- 名字：3×5 点阵，只支持 A–Z、0–9 和 `- + / . !`；文件名 `NAM<slot><name>` ≤ 8 字符。
-- 引擎 0.26：full rate 194 DSP；48 kHz 源在 44.1 kHz 踏板上不做重采样。
-- 所有转换在浏览器本地完成；没有服务器、没有上传。
+- Cover: 128×64, 1-bit, Zoom column-major RLE, 1,024 B capacity.
+- Names: 3×5 pixel font; only A–Z, 0–9 and `- + / . !`; filenames `NAM<slot><name>` are at most 8 characters.
+- Engine 0.26: full rate 194 DSP; 48 kHz sources run on the pedal's 44.1 kHz rate without sample-rate conversion.
+- All conversion happens locally in the browser; there is no server and no upload.
 
-## 参考与致谢
+## References & credits
 
-- **界面布局参考**：[daxe.art](https://daxe.art/) —— 深色工作台、侧栏 / 密集列表、等宽字与独立工具的气质。
-- **配色 / 硬件参考**：Zoom **G1on** —— 琥珀色 LCD、蓝色旋钮、灰黑面板。Zoom、G1on 是 Zoom Corporation 的商标；本项目与其无关联。
-- **引擎与 ZDL / 封面格式**：[themanro/ZoomMultistompZDL](https://github.com/themanro/ZoomMultistompZDL) —— NAMLite 0.26、模板、槽位 identity、封面编码。该 fork 的原创部分为 MIT；上游 [repeat98/ZoomMultistompZDL](https://github.com/repeat98/ZoomMultistompZDL) 另见其说明。
-- **NAM 格式**：[NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore)（Steven Atkinson，MIT）。
-- **字体**：[JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)（SIL Open Font License 1.1），已嵌入页面；许可见 `FONT-LICENSE.txt`。
-- **安装工具**：Zoom Effect Manager（第三方，不随本项目分发）。
-- **封面作品原图**：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)（版权归原作者，仅作 1-bit 导入效果展示）。
+- **UI layout reference**: [daxe.art](https://daxe.art/) — dark workbench, sidebar/dense list, monospace and small-tool character.
+- **Palette / hardware reference**: Zoom **G1on** — amber LCD, blue knobs, gray-black panel. Zoom and G1on are trademarks of Zoom Corporation; this project is not affiliated with or endorsed by Zoom.
+- **Engine and ZDL/cover format**: [themanro/ZoomMultistompZDL](https://github.com/themanro/ZoomMultistompZDL) — NAMLite 0.26, templates, slot identity and cover encoding. The fork's original work is MIT; see its notes for the upstream [repeat98/ZoomMultistompZDL](https://github.com/repeat98/ZoomMultistompZDL).
+- **NAM format**: [NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore) (Steven Atkinson, MIT).
+- **Font**: [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) (SIL Open Font License 1.1), embedded in the page; see `FONT-LICENSE.txt`.
+- **Installer**: Zoom Effect Manager (third-party; not bundled).
+- **Cover artwork source**: Bilibili [@__米粥__](https://www.bilibili.com/opus/1208525001677864960) (copyright belongs to the original artist; shown only as 1-bit import examples).
 
-第三方声明与完整 MIT / OFL 文本见 `NOTICE.txt`、`FONT-LICENSE.txt`。
+Third-party notices and the full MIT/OFL texts are in `NOTICE.txt` and `FONT-LICENSE.txt`.
 
-## 声明
+## Disclaimer
 
-- 本项目不是 Zoom Corporation 的官方产品，未获其背书或支持。
-- 自定义效果文件可能导致踏板死机 / 无法启动；请先备份 patch，风险自负。
-- 引擎模板与格式来自上述开源项目；NAM 捕捉由用户自行提供，本项目不分发任何 capture。
+- This is not an official Zoom Corporation product and is not endorsed or supported by Zoom.
+- Custom effect files can freeze or prevent the pedal from booting; back up your patches and use at your own risk.
+- Engine templates and formats come from the open-source projects above. NAM captures are supplied by the user; no captures are bundled.
