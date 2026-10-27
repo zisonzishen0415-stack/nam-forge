@@ -2,13 +2,21 @@
 
 [English](README.md) · [中文](README.zh-CN.md)
 
-把 NAM（Neural Amp Modeler）捕捉批量转成 Zoom MultiStomp 的 `.ZDL` 效果，并给踏板做 128×64 单色封面。
+把 NAM（Neural Amp Modeler）捕捉批量转成 Zoom MultiStomp 的 `.ZDL` 效果（MS-50G / MS-60B / MS-70CDR），并给踏板做 128×64 单色封面。界面配色参考 Zoom G1on。
 
 纯前端、离线运行：文件只在浏览器里处理，不上传。
 
 ![批量转换](preview-batch.png)
 ![封面设计](preview-design.png)
 ![导入图片](preview-import.png)
+
+
+## 兼容
+
+- **Zoom MultiStomp MS-50G / MS-60B / MS-70CDR**（原版；不支持 "+" 和 Four 系列）。
+- **Zoom G1on**：只作为外观/配色参考（琥珀屏、蓝旋钮、灰黑面板）；G1on 本身不能加载这些 ZDL。
+- **NAM / Neural Amp Modeler**：A2 Lite 捕捉（`.nam`，SlimmableContainer，3 声道 WaveNet）。
+- **输出**：`.ZDL`，用 **Zoom Effect Manager 2.3.3+** 安装。
 
 ## 封面作品
 
@@ -70,7 +78,6 @@
 
 ## 参考与致谢
 
-- **界面布局参考**：[daxe.art](https://daxe.art/) —— 深色工作台、侧栏 / 密集列表、等宽字与独立工具的气质。
 - **配色 / 硬件参考**：Zoom **G1on** —— 琥珀色 LCD、蓝色旋钮、灰黑面板。Zoom、G1on 是 Zoom Corporation 的商标；本项目与其无关联。
 - **引擎与 ZDL / 封面格式**：[themanro/ZoomMultistompZDL](https://github.com/themanro/ZoomMultistompZDL) —— NAMLite 0.26、模板、槽位 identity、封面编码。该 fork 的原创部分为 MIT；上游 [repeat98/ZoomMultistompZDL](https://github.com/repeat98/ZoomMultistompZDL) 另见其说明。
 - **NAM 格式**：[NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore)（Steven Atkinson，MIT）。
@@ -79,6 +86,8 @@
 - **封面作品原图**：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)（版权归原作者，仅作 1-bit 导入效果展示）。
 
 第三方声明与完整 MIT / OFL 文本见 `NOTICE.txt`、`FONT-LICENSE.txt`。
+
+**关键词：** Zoom MultiStomp、Zoom G1on、MS-50G（MS50G）、MS-60B（MS60B）、MS-70CDR（MS70CDR）、NAM、Neural Amp Modeler、NAM 捕捉、NAMLite、`.nam`、`.ZDL`、ZDL、Zoom Effect Manager、吉他、贝斯、综合效果器。
 
 ## 声明
 

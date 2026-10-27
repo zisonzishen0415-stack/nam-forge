@@ -2,7 +2,7 @@
 
 [English](README.md) · [中文](README.zh-CN.md)
 
-Turn NAM (Neural Amp Modeler) captures into Zoom MultiStomp `.ZDL` effects, and design 128×64 1-bit covers for the pedal.
+Turn NAM (Neural Amp Modeler) captures into Zoom MultiStomp `.ZDL` effects for the **MS-50G / MS-60B / MS-70CDR**, and design 128×64 1-bit covers. The UI palette is inspired by the **Zoom G1on**.
 
 Runs entirely in the browser. Files never leave your machine.
 
@@ -11,6 +11,13 @@ Runs entirely in the browser. Files never leave your machine.
 ![Image import](preview-import.png)
 
 > The app UI is Chinese-first. This README is in English.
+
+## Compatibility
+
+- **Zoom MultiStomp MS-50G / MS-60B / MS-70CDR** (original models; not the “+” series or the Four series).
+- **Zoom G1on**: visual/hardware reference only (amber LCD, blue knobs, gray-black panel). The G1on itself is not a target device for these ZDLs.
+- **NAM / Neural Amp Modeler**: A2 Lite captures (`.nam`, SlimmableContainer, 3-channel WaveNet).
+- **Output**: `.ZDL` effects for **Zoom Effect Manager 2.3.3+**.
 
 ## Cover gallery
 
@@ -72,7 +79,6 @@ Artwork source: Bilibili [@__米粥__, “这个月的一些零图” (Some sket
 
 ## References & credits
 
-- **UI layout reference**: [daxe.art](https://daxe.art/) — dark workbench, sidebar/dense list, monospace and small-tool character.
 - **Palette / hardware reference**: Zoom **G1on** — amber LCD, blue knobs, gray-black panel. Zoom and G1on are trademarks of Zoom Corporation; this project is not affiliated with or endorsed by Zoom.
 - **Engine and ZDL/cover format**: [themanro/ZoomMultistompZDL](https://github.com/themanro/ZoomMultistompZDL) — NAMLite 0.26, templates, slot identity and cover encoding. The fork's original work is MIT; see its notes for the upstream [repeat98/ZoomMultistompZDL](https://github.com/repeat98/ZoomMultistompZDL).
 - **NAM format**: [NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore) (Steven Atkinson, MIT).
@@ -81,6 +87,8 @@ Artwork source: Bilibili [@__米粥__, “这个月的一些零图” (Some sket
 - **Cover artwork source**: Bilibili [@__米粥__](https://www.bilibili.com/opus/1208525001677864960) (copyright belongs to the original artist; shown only as 1-bit import examples).
 
 Third-party notices and the full MIT/OFL texts are in `NOTICE.txt` and `FONT-LICENSE.txt`.
+
+**Keywords:** Zoom MultiStomp, Zoom G1on, MS-50G (MS50G), MS-60B (MS60B), MS-70CDR (MS70CDR), NAM, Neural Amp Modeler, NAM capture, NAMLite, `.nam`, `.ZDL`, ZDL, Zoom Effect Manager, amp modeling, guitar, bass, multi-effects, effect pedal.
 
 ## Disclaimer
 
