@@ -179,6 +179,7 @@ input[type=checkbox]{width:11px;height:11px;accent-color:var(--foam);margin:0}
 .data-table .col-name{width:112px}
 .data-table .col-slot{width:62px}
 .data-table .col-display{width:104px}
+.data-table .col-cover{width:112px}
 .data-table .col-actions{width:30px;text-align:right}
 .file-cell{display:flex;flex-direction:column;gap:1px;min-width:0}
 .file-cell b{font-weight:400;font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
@@ -207,7 +208,44 @@ input[type=checkbox]{width:11px;height:11px;accent-color:var(--foam);margin:0}
 .icon-btn:hover{color:var(--love)}
 .row-note{font-size:8.5px;color:var(--love);margin-top:1px;display:block;letter-spacing:.02em}
 .row-note.ok{color:var(--muted)}
-.row-cover{width:64px;height:32px;image-rendering:pixelated;border:1px solid var(--overlay);border-radius:0;display:block}
+
+/* ================= cover picker ================= */
+.row-cover-btn{padding:0;border:1px solid var(--overlay);border-radius:0;background:none;display:block;line-height:0}
+.row-cover-btn canvas{display:block;width:92px;height:auto;image-rendering:pixelated}
+.row-cover-btn:hover,.row-cover-btn:focus-visible{border-color:var(--foam);outline:none}
+.row-cover-btn:disabled{opacity:.4;cursor:not-allowed}
+.row-cover-btn.is-follow{border-style:dashed;opacity:.55}
+.row-cover-btn.is-follow:hover,.row-cover-btn:focus-visible{opacity:1}
+.row-cover-btn.is-over{border-color:var(--love)}
+.row-cover-badge{display:block;font-size:8px;line-height:1.5;letter-spacing:.04em;color:var(--muted);margin-top:2px;max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-cover-badge.is-set{color:var(--foam)}
+.row-cover-badge.is-over{color:var(--love)}
+.row-cover-badge.is-follow{color:var(--muted)}
+.cover-pop{position:fixed;z-index:90;width:332px;max-height:min(480px,calc(100vh - 32px));overflow:auto;background:var(--surface);border:1px solid var(--muted);border-radius:2px;box-shadow:0 14px 38px rgba(0,0,0,.55);padding:9px 10px 10px}
+.cover-pop-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:8px;letter-spacing:.14em;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--overlay)}
+.cover-pop-target{color:var(--gold);letter-spacing:.04em;font-family:var(--mono);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cover-pop-follow{display:flex;align-items:center;gap:6px;width:100%;border:0;background:none;color:var(--subtle);font-size:10.5px;font-weight:300;padding:7px 4px;text-align:left}
+.cover-pop-follow:hover{color:var(--text)}
+.cover-pop-follow::before{content:"↳";color:var(--foam);flex:none}
+.cover-pop-follow.is-on{color:var(--foam)}
+.cover-pop-follow.is-on::after{content:"✓";margin-left:auto;color:var(--foam)}
+.cover-pop-sep{height:1px;background:var(--overlay);margin:3px 0 8px}
+.cover-pop-label{font-size:8px;letter-spacing:.14em;color:var(--muted);margin:4px 0 6px}
+.cover-pop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.cover-pop-card{border:0;background:none;padding:0;text-align:left}
+.cover-pop-card canvas{display:block;width:100%;height:auto;image-rendering:pixelated;border:1px solid var(--overlay);background:#ffb02e}
+.cover-pop-card span{display:block;font-size:8px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cover-pop-card:hover canvas{border-color:var(--muted)}
+.cover-pop-card:hover span{color:var(--text)}
+.cover-pop-card.is-active canvas{border-color:var(--foam);box-shadow:0 0 0 1px var(--foam)}
+.cover-pop-card.is-active span{color:var(--foam)}
+.cover-pop-empty{font-size:9px;color:var(--muted);padding:6px 2px;letter-spacing:.03em}
+.cover-lib-grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+.cover-lib-card{position:relative}
+.cover-lib-card.is-active canvas{box-shadow:0 0 0 1px var(--foam)}
+.cover-lib-del{position:absolute;top:3px;right:3px;width:17px;height:17px;padding:0;border:0;border-radius:0;background:rgba(27,27,30,.85);color:var(--subtle);font-size:11px;line-height:1}
+.cover-lib-del:hover{color:var(--love)}
+.preset-grid .cover-lib-empty{grid-column:1/-1;font-size:9px;color:var(--muted);letter-spacing:.03em;padding:2px 0}
 
 /* ================= progress ================= */
 .progress-row{display:flex;align-items:center;gap:10px;margin-top:10px}
@@ -418,12 +456,13 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
 
         <div class="bar">
           <label class="bar-field"><span>起始槽位</span><input id="startSlot" type="number" min="1" max="216" value="40" inputmode="numeric"></label>
-          <label class="bar-field wide"><span>封面</span><select id="coverSelect"></select></label>
+          <label class="bar-field wide"><span>默认封面</span><select id="coverSelect"></select></label>
+          <button class="btn small" id="batchResetCoversBtn" title="清除所有逐项选择，全部跟随默认封面">全部恢复默认</button>
           <label class="bar-field"><span>字号</span><select id="textSizeSelect"><option value="small">小 · 1px</option><option value="large">大</option></select></label>
           <label class="bar-check"><input id="showNameToggle" type="checkbox" checked> 显示名字</label>
           <label class="bar-check"><input id="plateToggle" type="checkbox" checked> 名字底板</label>
           <label class="bar-check"><input id="haloToggle" type="checkbox" checked> 文字描边</label>
-          <span class="bar-note" id="batchHint">槽位从起始值往后自动分配，可逐行修改。</span>
+          <span class="bar-note" id="batchHint">点击每行封面图可单独选择；默认封面用于其余文件。</span>
         </div>
 
         <div class="list-head"><span>FILES</span><span id="listCount">0</span></div>
@@ -436,11 +475,12 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
                 <th class="col-name">SHORT NAME</th>
                 <th class="col-slot">SLOT</th>
                 <th class="col-display">PEDAL NAME</th>
+                <th class="col-cover">COVER</th>
                 <th class="col-actions"></th>
               </tr>
             </thead>
             <tbody id="namBody">
-              <tr class="empty-row"><td colspan="6">NO FILES — DROP .NAM ABOVE</td></tr>
+              <tr class="empty-row"><td colspan="7">NO FILES — DROP .NAM ABOVE</td></tr>
             </tbody>
           </table>
         </div>
@@ -470,11 +510,12 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
         </div>
 
         <div class="bar">
-          <label class="bar-field wide"><span>使用封面</span><select id="recoverCoverSelect"></select></label>
+          <label class="bar-field wide"><span>默认封面</span><select id="recoverCoverSelect"></select></label>
+          <button class="btn small" id="recoverResetCoversBtn" title="清除所有逐项选择，全部跟随默认封面">全部恢复默认</button>
           <label class="bar-check"><input id="recoverShowNameToggle" type="checkbox" checked> 显示名字</label>
           <label class="bar-check"><input id="recoverPlateToggle" type="checkbox" checked> 名字底板</label>
           <label class="bar-check"><input id="recoverHaloToggle" type="checkbox" checked> 文字描边</label>
-          <span class="bar-note">只写封面区和显示名；权重、FXID、版本不动。</span>
+          <span class="bar-note">点击每行封面可单独选择；只写封面区和显示名。</span>
         </div>
 
         <div class="list-head"><span>ZDL FILES</span><span>1,024 B COVER AREA</span></div>
@@ -486,7 +527,7 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
                 <th class="col-status">STATUS</th>
                 <th class="col-slot">SLOT / FXID</th>
                 <th class="col-name">DISPLAY NAME</th>
-                <th class="col-display">COVER</th>
+                <th class="col-cover">COVER</th>
                 <th class="col-actions"></th>
               </tr>
             </thead>
@@ -541,14 +582,23 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
 
         <div class="image-controls" id="imageControls" hidden>
           <label class="bar-field"><span>缩放</span><input id="imgScale" type="range" min="25" max="400" value="100"><b id="imgScaleVal">100%</b></label>
-          <label class="bar-field"><span>X</span><input id="imgX" type="range" min="-64" max="64" value="0"><b id="imgXVal">0</b></label>
-          <label class="bar-field"><span>Y</span><input id="imgY" type="range" min="-32" max="32" value="0"><b id="imgYVal">0</b></label>
+          <label class="bar-field"><span>X</span><input id="imgX" type="range" min="-128" max="128" value="0"><b id="imgXVal">0</b></label>
+          <label class="bar-field"><span>Y</span><input id="imgY" type="range" min="-64" max="64" value="0"><b id="imgYVal">0</b></label>
           <button class="btn small" id="imgReset">重置位置</button>
           <span class="hint">选「移动」工具可以直接拖动图片</span>
         </div>
 
         <div class="preset-head"><span class="list-head-title">PRESETS</span><span class="hint">点一下套用，再继续手绘或导入图片。</span></div>
         <div class="preset-grid" id="presetGrid"></div>
+
+        <div class="preset-head"><span class="list-head-title">MY COVERS</span><span class="hint">把当前编辑存进封面库，之后可在「批量转换」「换封面」里逐项选用。</span></div>
+        <div class="bar">
+          <label class="bar-field"><span>名称</span><input id="coverSaveName" maxlength="24" placeholder="例如 木纹 · AC30" spellcheck="false"></label>
+          <button class="btn primary small" id="saveCoverBtn">保存当前封面</button>
+          <button class="btn small" id="saveCoverAsBtn" hidden>另存为新封面</button>
+          <span class="bar-note" id="coverLibNote">封面只存在本机浏览器（localStorage）。</span>
+        </div>
+        <div class="preset-grid cover-lib-grid" id="coverLibGrid"></div>
 
         <div class="options-row">
           <label class="bar-check"><input id="showNameToggle2" type="checkbox" checked> 显示名字</label>
@@ -766,7 +816,7 @@ async function thumbnailPng(pixels){
  g.putImageData(new ImageData(new Uint8ClampedArray(thumbnail(pixels)),128,96),0,0);
  return new Promise(r=>c.toBlob(r,'image/png'));
 }
-const api={icons,draw,picture,thumbnail,thumbnailPng,writeCover,nameText};
+const api={icons,draw,picture,thumbnail,thumbnailPng,writeCover,nameText,PIXEL_ASPECT};
 if(typeof module!=='undefined')module.exports=api;else root.CoverArt=api;
 })(globalThis);
 
@@ -911,6 +961,10 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
   const NAME_SCALE_MAX = M.cover.name_scale_max;
   const PIC_CAP = M.cover.capacity;
   const ENGINE_VERSION = M.output_version;
+  // Every preview renders at the pedal's real pixel shape: 128x64 memory rows
+  // stretched 1.4x vertically, exactly like the ZDL shows on the LCD.
+  const LCD_ASPECT = CoverArt.PIXEL_ASPECT || 1.4;
+  const LCD_H = Math.round(64 * LCD_ASPECT);
   const COVER_KEY = 'namforge-cover-v2';
   const REG_KEY = 'namforge-exports-v1';
   const $ = (s, r = document) => r.querySelector(s);
@@ -1142,21 +1196,12 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
   }
   function saveDesign() {
     try {
-      localStorage.setItem(COVER_KEY, JSON.stringify({
-        preset: design.preset, base: bytesToB64(design.base), textInk: design.textInk,
-        area: design.area, scale: design.scale, plate: design.plate, halo: design.halo, showName: design.showName !== false, textFill: design.textFill || 'solid', textSize: design.textSize || 'small', textX: design.textX || 0, textY: design.textY || 0
-      }));
+      localStorage.setItem(COVER_KEY, JSON.stringify(designToJson(design)));
     } catch { /* storage full / private mode */ }
   }
   function loadDesign() {
     try {
-      const d = JSON.parse(localStorage.getItem(COVER_KEY) || 'null');
-      if (!d || typeof d.base !== 'string') return null;
-      const base = b64ToBytes(d.base);
-      if (base.length !== 128 * 64) return null;
-      const area = Array.isArray(d.area) && d.area.length === 4 ? d.area.map(Number) : [4, 10, 123, 53];
-      const scale = Array.isArray(d.scale) && d.scale.length === 2 ? d.scale.map(Number) : [6, 6];
-      return { preset: d.preset || 'custom', base, textInk: d.textInk ? 1 : 0, area, scale, plate: !!d.plate, halo: !!d.halo, showName: d.showName !== false, textFill: d.textFill === 'dither' ? 'dither' : 'solid', textSize: d.textSize === 'large' ? 'large' : 'small', textX: Number(d.textX) || 0, textY: Number(d.textY) || 0 };
+      return designFromJson(JSON.parse(localStorage.getItem(COVER_KEY) || 'null'));
     } catch { return null; }
   }
   let design = loadDesign() || makeDesign('text-light');
@@ -1176,15 +1221,18 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
   const LCD_PAPER = '#ffb02e';
   function paintLcd(canvas, pixels, opts = {}) {
     const scale = opts.scale || 4;
-    const aspect = opts.aspect === undefined ? 1 : opts.aspect;
+    const aspect = opts.aspect === undefined ? LCD_ASPECT : opts.aspect;
     const W = 128 * scale, H = Math.round(64 * scale * aspect);
     if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
     const g = canvas.getContext('2d');
     g.fillStyle = opts.paper || LCD_PAPER;
     g.fillRect(0, 0, W, H);
     g.fillStyle = opts.ink || LCD_INK;
-    for (let y = 0; y < 64; y++) for (let x = 0; x < 128; x++) {
-      if (pixels[(y << 7) + x]) g.fillRect(x * scale, Math.round(y * scale * aspect), scale, Math.max(1, Math.round(scale * aspect)));
+    // Rows land on whole device pixels; rounding both edges avoids seams
+    // when the LCD's 1.4x pixel aspect does not divide the scale evenly.
+    for (let y = 0; y < 64; y++) {
+      const Y0 = Math.round(y * scale * aspect), Y1 = Math.round((y + 1) * scale * aspect);
+      for (let x = 0; x < 128; x++) if (pixels[(y << 7) + x]) g.fillRect(x * scale, Y0, scale, Math.max(1, Y1 - Y0));
     }
     if (opts.grid) {
       g.strokeStyle = 'rgba(90,31,0,.18)';
@@ -1196,12 +1244,17 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
       g.beginPath(); g.moveTo(0, H / 2 + .5); g.lineTo(W, H / 2 + .5); g.stroke();
     }
   }
-  function paintMini(canvas, pixels) {
-    canvas.width = 128; canvas.height = 64;
+  function paintMini(canvas, pixels, opts = {}) {
+    const scale = opts.scale || 1;
+    const paper = opts.paper || LCD_PAPER, ink = opts.ink || LCD_INK;
+    canvas.width = 128 * scale; canvas.height = LCD_H * scale;
     const g = canvas.getContext('2d');
-    g.fillStyle = LCD_PAPER; g.fillRect(0, 0, 128, 64);
-    g.fillStyle = LCD_INK;
-    for (let y = 0; y < 64; y++) for (let x = 0; x < 128; x++) if (pixels[(y << 7) + x]) g.fillRect(x, y, 1, 1);
+    g.fillStyle = paper; g.fillRect(0, 0, canvas.width, canvas.height);
+    g.fillStyle = ink;
+    for (let y = 0; y < 64; y++) {
+      const Y0 = Math.round(y * LCD_ASPECT) * scale, Y1 = Math.round((y + 1) * LCD_ASPECT) * scale;
+      for (let x = 0; x < 128; x++) if (pixels[(y << 7) + x]) g.fillRect(x * scale, Y0, scale, Math.max(1, Y1 - Y0));
+    }
   }
   function paintThumb(canvas, pixels) {
     const rgba = CoverArt.thumbnail(pixels);
@@ -1213,6 +1266,329 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     g.clearRect(0, 0, 256, 192);
     g.imageSmoothingEnabled = false;
     g.drawImage(tmp, 0, 0, 256, 192);
+  }
+
+  // ---------------------------------------------------------------- cover library
+  // Saved covers live in localStorage. Per-file choices reference an immutable
+  // snapshot ('saved:<id>'), a built-in preset id, or null (= follow default).
+  const COVERS_KEY = 'namforge-covers-v1';
+  function designToJson(d) {
+    return {
+      preset: d.preset, base: bytesToB64(d.base), textInk: d.textInk,
+      area: d.area, scale: d.scale, plate: !!d.plate, halo: !!d.halo,
+      showName: d.showName !== false, textFill: d.textFill || 'solid',
+      textSize: d.textSize === 'large' ? 'large' : 'small',
+      textX: Number(d.textX) || 0, textY: Number(d.textY) || 0
+    };
+  }
+  function designFromJson(d) {
+    if (!d || typeof d.base !== 'string') return null;
+    const base = b64ToBytes(d.base);
+    if (base.length !== 128 * 64) return null;
+    return {
+      preset: d.preset || 'custom', base, textInk: d.textInk ? 1 : 0,
+      area: Array.isArray(d.area) && d.area.length === 4 ? d.area.map(Number) : [4, 10, 123, 53],
+      scale: Array.isArray(d.scale) && d.scale.length === 2 ? d.scale.map(Number) : [6, 6],
+      plate: !!d.plate, halo: !!d.halo, showName: d.showName !== false,
+      textFill: d.textFill === 'dither' ? 'dither' : 'solid',
+      textSize: d.textSize === 'large' ? 'large' : 'small',
+      textX: Number(d.textX) || 0, textY: Number(d.textY) || 0
+    };
+  }
+  let coverLib = null;
+  function getCoverLibrary() {
+    if (coverLib) return coverLib;
+    try {
+      const a = JSON.parse(localStorage.getItem(COVERS_KEY) || '[]');
+      coverLib = Array.isArray(a) ? a.filter(c => c && c.id && designFromJson(c.design)).map(c => ({
+        id: String(c.id), name: String(c.name || '未命名').slice(0, 24), ts: Number(c.ts) || 0, design: c.design
+      })) : [];
+    } catch { coverLib = []; }
+    return coverLib;
+  }
+  function setCoverLibrary(lib) {
+    try { localStorage.setItem(COVERS_KEY, JSON.stringify(lib)); } catch { return false; }
+    coverLib = lib;
+    return true;
+  }
+  function findSavedCover(id) {
+    const c = getCoverLibrary().find(x => x.id === id);
+    if (!c) return null;
+    const d = designFromJson(c.design);
+    return d ? { id: c.id, name: c.name, design: d } : null;
+  }
+  function newCoverId() {
+    return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+  function autoCoverName() {
+    const lib = getCoverLibrary();
+    const names = new Set(lib.map(c => c.name));
+    let n = lib.length + 1;
+    while (names.has('封面 ' + n)) n++;
+    return '封面 ' + n;
+  }
+  let editingCoverId = null;
+
+  function resolveCoverLayer(override) {
+    if (typeof override === 'string' && override.startsWith('saved:')) {
+      const c = findSavedCover(override.slice(6));
+      if (c) return { design: c.design, label: c.name, savedId: c.id };
+    } else if (typeof override === 'string' && override in PRESETS) {
+      return { design: makeDesign(override), label: PRESETS[override].label, preset: override };
+    }
+    return { design, label: '默认', preset: design.preset };
+  }
+  function coverPixelsFor(name, override) {
+    return renderCoverPixels(resolveCoverLayer(override).design, name);
+  }
+  function coverLabelFor(override) {
+    return resolveCoverLayer(override).label;
+  }
+
+  function paintCoverCanvas(cv, pixels) {
+    paintMini(cv, pixels, { paper: LCD_PAPER, ink: LCD_INK });
+  }
+
+  function ensureSavedCoverForCurrentDesign(desiredName) {
+    const json = designToJson(design);
+    const key = JSON.stringify(json);
+    const lib = getCoverLibrary().slice();
+    const hit = lib.find(c => JSON.stringify(c.design) === key);
+    if (hit) return hit;
+    const entry = { id: newCoverId(), name: (desiredName || '').trim().slice(0, 24) || autoCoverName(), ts: Date.now(), design: json };
+    lib.push(entry);
+    if (!setCoverLibrary(lib)) { toast('保存失败：浏览器本地存储已满', 'bad'); return null; }
+    renderCoverLib();
+    return entry;
+  }
+  function saveCurrentCover(asNew = false) {
+    const lib = getCoverLibrary().slice();
+    const idx = (!asNew && editingCoverId) ? lib.findIndex(c => c.id === editingCoverId) : -1;
+    const existing = idx >= 0 ? lib[idx] : null;
+    const typed = ($('#coverSaveName')?.value || '').trim().slice(0, 24);
+    const name = typed || (existing ? existing.name : autoCoverName());
+    const dup = lib.find(c => c.name === name && (!existing || c.id !== existing.id));
+    if (dup) { toast(`已有同名封面「${name}」，换个名称或点「更新」`, 'bad'); return; }
+    const entry = { id: existing ? existing.id : newCoverId(), name, ts: Date.now(), design: designToJson(design) };
+    if (idx >= 0) lib[idx] = entry; else lib.push(entry);
+    if (!setCoverLibrary(lib)) { toast('保存失败：浏览器本地存储已满', 'bad'); return; }
+    editingCoverId = entry.id;
+    renderCoverLib(); redrawAll();
+    toast(idx >= 0 ? `已更新封面「${name}」` : `已保存封面「${name}」`, 'good');
+  }
+  function loadSavedCoverIntoEditor(id) {
+    const c = findSavedCover(id);
+    if (!c) { toast('这个封面找不到了', 'bad'); renderCoverLib(); return; }
+    design = { ...c.design, base: new Uint8Array(c.design.base) };
+    editingCoverId = c.id;
+    if ($('#coverSaveName')) $('#coverSaveName').value = c.name;
+    resetHistory(); saveDesign(); syncToggleUi(); redrawAll();
+    toast(`已载入封面「${c.name}」`);
+  }
+  function deleteSavedCover(id, name) {
+    if (!confirm(`删除封面「${name}」？使用它逐项选择的文件会回到默认封面。`)) return;
+    const lib = getCoverLibrary().filter(c => c.id !== id);
+    if (!setCoverLibrary(lib)) { toast('删除失败', 'bad'); return; }
+    if (editingCoverId === id) editingCoverId = null;
+    for (const e of [...state.files, ...state.zdlFiles]) if (e.coverOverride === 'saved:' + id) e.coverOverride = null;
+    renderCoverLib(); redrawAll();
+    toast(`已删除封面「${name}」`);
+  }
+
+  function renderCoverLib() {
+    const grid = $('#coverLibGrid');
+    if (!grid) return;
+    const lib = getCoverLibrary();
+    grid.innerHTML = '';
+    if (!lib.length) {
+      const empty = document.createElement('div');
+      empty.className = 'cover-lib-empty';
+      empty.textContent = '还没有保存的封面 —— 先在上面编辑，再点「保存当前封面」。';
+      grid.append(empty);
+    }
+    for (const c of lib) {
+      const card = document.createElement('div');
+      card.className = 'preset-card cover-lib-card';
+      card.dataset.coverJson = JSON.stringify(c.design);
+      const cv = document.createElement('canvas');
+      cv.width = 128; cv.height = 64;
+      const d = designFromJson(c.design) || makeDesign('text-light');
+      card.$design = d;
+      paintCoverCanvas(cv, renderCoverPixels(d, currentPreviewName()));
+      const label = document.createElement('span');
+      label.textContent = c.name;
+      card.title = `${c.name} —— 点击载入编辑器`;
+      card.append(cv, label);
+      card.addEventListener('click', () => loadSavedCoverIntoEditor(c.id));
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'cover-lib-del';
+      del.textContent = '✕';
+      del.title = '删除这个封面';
+      del.addEventListener('click', ev => { ev.stopPropagation(); deleteSavedCover(c.id, c.name); });
+      card.append(del);
+      grid.append(card);
+    }
+    syncCoverLibUi();
+  }
+  function syncCoverLibUi() {
+    const lib = getCoverLibrary();
+    const cur = JSON.stringify(designToJson(design));
+    for (const card of $$('.cover-lib-card')) {
+      card.classList.toggle('is-active', editingCoverId !== null && card.dataset.coverJson === cur &&
+        !!lib.find(c => c.id === editingCoverId && JSON.stringify(c.design) === cur));
+      const cv = card.querySelector('canvas');
+      if (cv && card.$design) paintCoverCanvas(cv, renderCoverPixels(card.$design, currentPreviewName()));
+    }
+    const note = $('#coverLibNote');
+    if (note) note.textContent = `封面只存在本机浏览器 · 已保存 ${lib.length} 个`;
+    const saveBtn = $('#saveCoverBtn'), asBtn = $('#saveCoverAsBtn');
+    const active = editingCoverId ? lib.find(c => c.id === editingCoverId) : null;
+    if (saveBtn) saveBtn.textContent = active ? `更新「${active.name}」` : '保存当前封面';
+    if (asBtn) asBtn.hidden = !active;
+  }
+
+  function resetEntryCovers(kind) {
+    const list = kind === 'zdl' ? state.zdlFiles : state.files;
+    const targets = list.filter(e => e.status !== 'error' && e.status !== 'converting' && e.coverOverride);
+    if (!targets.length) { toast('没有单独选择过封面的文件'); return; }
+    for (const e of targets) e.coverOverride = null;
+    if (kind === 'zdl') renderRecover();
+    renderRowCovers();
+    redrawAll();
+    toast(`已恢复默认封面：${targets.length} 个文件`);
+  }
+
+  // ---------------------------------------------------------------- cover picker
+  let coverPicker = null;
+  function closeCoverPicker() {
+    if (!coverPicker) return;
+    coverPicker.el.remove();
+    document.removeEventListener('pointerdown', coverPicker.onDoc, true);
+    document.removeEventListener('keydown', coverPicker.onKey, true);
+    window.removeEventListener('resize', closeCoverPicker);
+    coverPicker = null;
+  }
+  function setEntryCover(kind, id, value) {
+    const e = (kind === 'zdl' ? state.zdlFiles : state.files).find(x => x.id === id);
+    if (!e) { closeCoverPicker(); return; }
+    e.coverOverride = value || null;
+    closeCoverPicker();
+    const label = kind === 'zdl' ? e.name : e.shortName;
+    if (kind === 'nam' && e.status === 'done') {
+      setEntryStatus(e, 'ready');
+      updateStats();
+      toast(`${label} 的封面已更新，需要重新转换才会写进 ZDL`, 'good');
+    } else if (kind === 'zdl' && e.status === 'applied') {
+      e.status = 'ready';
+      renderRecover();
+      toast(`${label} 的封面已更新，需要重新点「应用封面」`, 'good');
+    } else {
+      toast(value ? `${label}：已选择封面「${coverLabelFor(value)}」` : '已恢复跟随默认封面');
+    }
+    renderRowCovers();
+    redrawPedalPreview();
+  }
+  function openCoverPicker(anchor, kind, id) {
+    closeCoverPicker();
+    const e = (kind === 'zdl' ? state.zdlFiles : state.files).find(x => x.id === id);
+    if (!e) return;
+    const targetName = (kind === 'zdl' ? e.name : e.shortName) || '';
+    const current = e.coverOverride || null;
+    const el = document.createElement('div');
+    el.className = 'cover-pop';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-label', '选择封面');
+
+    el.innerHTML = `<div class="cover-pop-head"><span>选择封面</span><span class="cover-pop-target">${esc(targetName || '—')}</span></div>`;
+
+    const follow = document.createElement('button');
+    follow.type = 'button';
+    follow.className = 'cover-pop-follow' + (!current ? ' is-on' : '');
+    follow.textContent = '跟随默认封面';
+    follow.addEventListener('click', () => setEntryCover(kind, id, null));
+    el.append(follow);
+
+    const sep = document.createElement('div');
+    sep.className = 'cover-pop-sep';
+    el.append(sep);
+
+    const makeCard = (labelText, designForCard, value, note) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'cover-pop-card' + (value === current ? ' is-active' : '');
+      const cv = document.createElement('canvas');
+      cv.width = 128; cv.height = 64;
+      paintCoverCanvas(cv, renderCoverPixels(designForCard, targetName || 'AC30C'));
+      const label = document.createElement('span');
+      label.textContent = labelText;
+      card.append(cv, label);
+      card.title = note || labelText;
+      card.addEventListener('click', () => {
+        if (value === '__current__') {
+          const saved = ensureSavedCoverForCurrentDesign();
+          if (!saved) return;
+          setEntryCover(kind, id, 'saved:' + saved.id);
+        } else setEntryCover(kind, id, value);
+      });
+      return card;
+    };
+
+    const currentLabel = document.createElement('div');
+    currentLabel.className = 'cover-pop-label';
+    currentLabel.textContent = '当前编辑';
+    el.append(currentLabel);
+    el.append(makeCard('当前编辑的封面', design, '__current__', '使用「封面设计」里正在编辑的封面（自动存入封面库）'));
+
+    const lib = getCoverLibrary();
+    const savedLabel = document.createElement('div');
+    savedLabel.className = 'cover-pop-label';
+    savedLabel.textContent = '我的封面';
+    el.append(savedLabel);
+    if (!lib.length) {
+      const empty = document.createElement('div');
+      empty.className = 'cover-pop-empty';
+      empty.textContent = '还没有保存的封面。到「封面设计」编辑后点「保存当前封面」。';
+      el.append(empty);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'cover-pop-grid';
+      for (const c of lib) {
+        const d = designFromJson(c.design);
+        if (!d) continue;
+        grid.append(makeCard(c.name, d, 'saved:' + c.id, `${c.name}（已保存）`));
+      }
+      el.append(grid);
+    }
+
+    const presetLabel = document.createElement('div');
+    presetLabel.className = 'cover-pop-label';
+    presetLabel.textContent = '内置预设';
+    el.append(presetLabel);
+    const pgrid = document.createElement('div');
+    pgrid.className = 'cover-pop-grid';
+    for (const [pid, pr] of Object.entries(PRESETS)) {
+      pgrid.append(makeCard(pr.label, makeDesign(pid), pid, pr.note || pr.label));
+    }
+    el.append(pgrid);
+
+    el.style.visibility = 'hidden';
+    document.body.append(el);
+    const r = anchor.getBoundingClientRect();
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+    let top = r.bottom + 4;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 4);
+    el.style.left = Math.round(left) + 'px';
+    el.style.top = Math.round(top) + 'px';
+    el.style.visibility = '';
+
+    const onDoc = ev => { if (!el.contains(ev.target)) closeCoverPicker(); };
+    const onKey = ev => { if (ev.key === 'Escape') { ev.stopPropagation(); closeCoverPicker(); } };
+    document.addEventListener('pointerdown', onDoc, true);
+    document.addEventListener('keydown', onKey, true);
+    window.addEventListener('resize', closeCoverPicker);
+    coverPicker = { el, onDoc, onKey };
   }
 
   // ---------------------------------------------------------------- previews
@@ -1245,13 +1621,15 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
   function redrawEditor() {
     if (!$('#editor')) return;
     const pixels = renderCoverPixels(design, currentPreviewName());
-    paintLcd($('#editor'), pixels, { scale: 6, aspect: 1, grid: $('#gridToggle').checked });
-    $('#editorInfo').textContent = `128 × 64 · ${rleLength(pixels)} B`;
+    paintLcd($('#editor'), pixels, { scale: 6, grid: $('#gridToggle').checked });
+    $('#editorInfo').textContent = `128 × 64 · LCD ${LCD_ASPECT}× · ${rleLength(pixels)} B`;
   }
   function redrawPedalPreview() {
-    if ($('#pedalPreview')) paintLcd($('#pedalPreview'), renderCoverPixels(design, currentPreviewName()), { scale: 4, aspect: 1.4 });
-    if ($('#batchPreview')) paintLcd($('#batchPreview'), renderCoverPixels(design, firstBatchName()), { scale: 4, aspect: 1.4 });
-    if ($('#recoverPreview')) paintLcd($('#recoverPreview'), renderCoverPixels(design, firstRecoverName()), { scale: 4, aspect: 1.4 });
+    if ($('#pedalPreview')) paintLcd($('#pedalPreview'), renderCoverPixels(design, currentPreviewName()), { scale: 4 });
+    const fb = state.files.find(x => x.status !== 'error');
+    if ($('#batchPreview')) paintLcd($('#batchPreview'), coverPixelsFor(firstBatchName(), fb && fb.coverOverride), { scale: 4 });
+    const fr = state.zdlFiles.find(x => x.status !== 'error');
+    if ($('#recoverPreview')) paintLcd($('#recoverPreview'), coverPixelsFor(firstRecoverName(), fr && fr.coverOverride), { scale: 4 });
     if ($('#thumbPreview')) paintThumb($('#thumbPreview'), renderCoverPixels(design, currentPreviewName()));
     if ($('#batchPreviewName')) $('#batchPreviewName').textContent = state.files.some(x => x.status !== 'error') ? firstBatchName().toUpperCase() : '—';
     if ($('#recoverPreviewName')) $('#recoverPreviewName').textContent = state.zdlFiles.some(x => x.status !== 'error') ? firstRecoverName().toUpperCase() : '—';
@@ -1263,9 +1641,10 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     syncToggleUi();
     markPresetActive();
     renderRowCovers();
+    syncCoverLibUi();
   }
   function markPresetActive() {
-    $$('.preset-card').forEach(c => c.classList.toggle('is-active', c.dataset.preset === design.preset));
+    $$('.preset-card:not(.cover-lib-card)').forEach(c => c.classList.toggle('is-active', c.dataset.preset === design.preset));
     for (const sel of [$('#coverSelect'), $('#recoverCoverSelect')]) {
       if (!sel) continue;
       sel.value = design.preset in PRESETS ? design.preset : 'custom';
@@ -1316,6 +1695,8 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
         textX: Number(d.textX) || 0, textY: Number(d.textY) || 0, textFill: 'solid'
       };
       if (data.previewName && $('#previewName')) $('#previewName').value = String(data.previewName).slice(0, 8);
+      editingCoverId = null;
+      if ($('#coverSaveName')) $('#coverSaveName').value = '';
       resetHistory(); saveDesign(); syncToggleUi(); redrawAll();
       toast('设计已导入');
     } catch (e) { toast('导入失败：' + (e.message || e), 'bad'); }
@@ -1323,20 +1704,19 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
   async function exportCoverPng() {
     const pixels = renderCoverPixels(design, currentPreviewName());
     const cv = document.createElement('canvas');
-    cv.width = 128; cv.height = 64;
-    const g = cv.getContext('2d');
-    g.fillStyle = LCD_PAPER; g.fillRect(0, 0, 128, 64);
-    g.fillStyle = LCD_INK;
-    for (let y = 0; y < 64; y++) for (let x = 0; x < 128; x++) if (pixels[(y << 7) + x]) g.fillRect(x, y, 1, 1);
+    const scale = 4;
+    paintLcd(cv, pixels, { scale });
     const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
     const bytes = new Uint8Array(await blob.arrayBuffer());
     const safe = (currentPreviewName() || 'cover').replace(/[^A-Za-z0-9_-]/g, '') || 'cover';
     downloadBytes('cover-' + safe + '.png', bytes, 'image/png');
-    toast('封面已导出 PNG');
+    toast('封面已导出 PNG（' + cv.width + '×' + cv.height + '，踏板比例）');
   }
   function applyPreset(id) {
     if (!(id in PRESETS)) return;
     design = makeDesign(id);
+    editingCoverId = null;
+    if ($('#coverSaveName')) $('#coverSaveName').value = '';
     resetHistory();
     saveDesign();
     redrawAll();
@@ -1354,12 +1734,8 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
       card.className = 'preset-card';
       card.dataset.preset = id;
       const cv = document.createElement('canvas');
-      cv.width = 128; cv.height = 64;
-      const g = cv.getContext('2d');
-      g.fillStyle = LCD_PAPER; g.fillRect(0, 0, 128, 64);
       const pixels = renderCoverPixels(makeDesign(id), 'AC30C');
-      g.fillStyle = LCD_INK;
-      for (let y = 0; y < 64; y++) for (let x = 0; x < 128; x++) if (pixels[(y << 7) + x]) g.fillRect(x, y, 1, 1);
+      paintMini(cv, pixels);
       const label = document.createElement('span');
       label.textContent = pr.label;
       card.append(cv, label);
@@ -1476,8 +1852,8 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
       const r = $('#editor').getBoundingClientRect();
       const dx = Math.round((ev.clientX - movingImage.startX) / r.width * 128);
       const dy = Math.round((ev.clientY - movingImage.startY) / r.height * 64);
-      importTransform.x = clamp(movingImage.ox + dx, -64, 64);
-      importTransform.y = clamp(movingImage.oy + dy, -32, 32);
+      importTransform.x = clamp(movingImage.ox + dx, -128, 128);
+      importTransform.y = clamp(movingImage.oy + dy, -64, 64);
       syncImageControls();
       renderImportImage();
       return;
@@ -1522,6 +1898,7 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     drawing = null;
     pushHistory();
     markCustom(); redrawAll();
+    renderCoverLib();
   }
   function applyImageFile(file) {
     const url = URL.createObjectURL(file);
@@ -1550,16 +1927,25 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
   }
   function renderImportImage() {
     if (!importImage) return;
-    const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64;
-    const g = cv.getContext('2d');
-    g.fillStyle = '#fff'; g.fillRect(0, 0, 128, 64);
-    const cover = Math.max(128 / importImage.width, 64 / importImage.height);
+    // Map the image into the pedal's display space (128 x 64*1.4 square pixels)
+    // with cover-fit, then collapse rows back to the 64-row bitmap. Fitting in
+    // memory space instead would squash/stretch the picture on the LCD.
+    const dispH = 64 * LCD_ASPECT;
+    const mid = document.createElement('canvas');
+    mid.width = 128; mid.height = Math.round(dispH);
+    const mg = mid.getContext('2d');
+    mg.fillStyle = '#fff'; mg.fillRect(0, 0, mid.width, mid.height);
+    const cover = Math.max(128 / importImage.width, dispH / importImage.height);
     const s = cover * importTransform.scale;
     const w = importImage.width * s, h = importImage.height * s;
     const x = (128 - w) / 2 + importTransform.x;
-    const y = (64 - h) / 2 + importTransform.y;
+    const y = (dispH - h) / 2 + importTransform.y * LCD_ASPECT;
+    mg.imageSmoothingEnabled = true;
+    mg.drawImage(importImage, x, y, w, h);
+    const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64;
+    const g = cv.getContext('2d');
     g.imageSmoothingEnabled = true;
-    g.drawImage(importImage, x, y, w, h);
+    g.drawImage(mid, 0, 0, 128, Math.round(dispH), 0, 0, 128, 64);
     const data = g.getImageData(0, 0, 128, 64).data;
     importGray = new Uint8Array(128 * 64);
     for (let i = 0; i < importGray.length; i++) importGray[i] = Math.round(.299 * data[i * 4] + .587 * data[i * 4 + 1] + .114 * data[i * 4 + 2]);
@@ -1679,6 +2065,8 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     }
     const locked = status === 'done' || status === 'converting';
     row.querySelectorAll('input').forEach(i => { i.disabled = locked; });
+    const coverBtn = row.querySelector('button[data-cover-kind]');
+    if (coverBtn) coverBtn.disabled = status === 'converting';
     const rm = row.querySelector('[data-remove]');
     if (rm) rm.disabled = status === 'converting';
     if (status === 'error' || status === 'done') updateBatchButtons();
@@ -1703,7 +2091,7 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     const body = $('#namBody');
     if (!body) return;
     if (!state.files.length) {
-      body.innerHTML = '<tr class="empty-row"><td colspan="6">NO FILES — DROP .NAM ABOVE</td></tr>';
+      body.innerHTML = '<tr class="empty-row"><td colspan="7">NO FILES — DROP .NAM ABOVE</td></tr>';
       updateStats(); redrawPedalPreview(); return;
     }
     body.innerHTML = state.files.map(e => {
@@ -1711,16 +2099,20 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
       const statusMap = { wait: ['status-wait', 'WAIT'], ready: ['status-ready', 'READY'], converting: ['status-converting', 'RUN'], done: ['status-done', 'DONE'], error: ['status-error', 'ERR'] };
       const [cls, label] = statusMap[e.status] || statusMap.wait;
       const bad = e.status !== 'error' && validateEntry(e) ? ' is-bad' : '';
+      const over = coverOverInfo(e);
       return `<tr data-id="${e.id}">
         <td><div class="file-cell"><b title="${esc(e.file.name)}">${esc(e.file.name)}</b><span>${esc(rate)}</span>${e.error ? `<span class="row-note">${esc(e.error)}</span>` : '<span class="row-note ok"></span>'}</div></td>
         <td><span class="status-pill ${cls}">${label}</span></td>
         <td><input class="cell-input${bad}" data-edit="name" value="${esc(e.shortName)}" maxlength="8" spellcheck="false" ${e.status === 'done' || e.status === 'converting' ? 'disabled' : ''}></td>
         <td><input class="cell-input slot-input${bad}" data-edit="slot" type="number" min="1" max="216" value="${e.slot || ''}" ${e.status === 'done' || e.status === 'converting' ? 'disabled' : ''}></td>
         <td><span class="display-name">${e.shortName ? esc(pedalDisplay(e.shortName)) : '—'}</span></td>
+        <td><button class="row-cover-btn${over.isSet ? '' : ' is-follow'}${over.isOver ? ' is-over' : ''}" type="button" data-cover-id="${e.id}" data-cover-kind="nam" title="点击单独选择封面"><canvas class="row-cover" width="128" height="64"></canvas></button>
+          <span class="row-cover-badge ${over.isOver ? 'is-over' : over.isSet ? 'is-set' : 'is-follow'}">${esc(over.text)}</span></td>
         <td><button class="icon-btn" data-remove="nam" title="移除" ${e.status === 'converting' ? 'disabled' : ''}>✕</button></td>
       </tr>`;
     }).join('');
     updateStats();
+    renderRowCovers();
     redrawPedalPreview();
   }
   function pedalDisplay(name) { try { return NAMLoader.pedalName(name); } catch { return name; } }
@@ -1784,7 +2176,8 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     const binName = meta.generated ? 'gen-base.bin' : meta.file;
     const template = b64ToBytes(ENGINE_DATA.bins[binName]);
     const result = await NAMLoader.convertNamed(e.model, template, { ...M, cover: null }, e.slot, e.shortName, null, {});
-    const pixels = renderCoverPixels(design, e.shortName);
+    const layer = resolveCoverLayer(e.coverOverride);
+    const pixels = renderCoverPixels(layer.design, e.shortName);
     if (rleLength(pixels) > PIC_CAP) throw new Error('封面数据超过 1024 B，请换一个更简单的封面');
     if (!Number.isInteger(meta.picture_offset) || meta.picture_offset + PIC_CAP > result.bytes.length) throw new Error('封面写入位置无效');
     const blob = CoverArt.picture({ capacity: PIC_CAP }, pixels);
@@ -1796,8 +2189,9 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     report.sha256 = await NAMLoader.sha256(result.bytes);
     report.sourceFile = e.file.name;
     report.sourceSha256 = e.sourceSha || await NAMLoader.sha256(new TextEncoder().encode(e.text));
-    report.coverPreset = design.preset;
-    report.cover = { plate: design.plate, halo: design.halo, textInk: design.textInk };
+    report.coverPreset = layer.preset || layer.design.preset;
+    report.coverName = layer.label;
+    report.cover = { plate: layer.design.plate, halo: layer.design.halo, textInk: layer.design.textInk };
     report.displayName = NAMLoader.pedalName(e.shortName);
     report.note = 'Cover written by NAM FORGE; weights, slot identity and version are unchanged.';
     return { entry: e, bytes: result.bytes, png: await thumbnailPng(pixels), report };
@@ -1881,16 +2275,16 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     lines.push('NAM FORGE 批量导出');
     lines.push('生成时间: ' + new Date().toLocaleString());
     lines.push('引擎: ' + ENGINE_VERSION + ' · Full rate · 每块 194 DSP');
-    lines.push('封面: ' + (PRESETS[design.preset]?.label || '自定义') + (design.plate ? ' · 名字底板' : '') + (design.halo ? ' · 文字描边' : ''));
+    lines.push('封面: 默认 ' + (PRESETS[design.preset]?.label || '自定义') + (design.plate ? ' · 名字底板' : '') + (design.halo ? ' · 文字描边' : '') + '；逐项选择的封面见下表');
     lines.push('');
     lines.push('安装: Zoom Effect Manager 2.3.3+ → Settings → Read Effects from folder → From Folder。');
     lines.push('ZDL 和同名 PNG 必须放在一起，不要改文件名（踏板只认前 8 个字符）。');
     lines.push('只适用于原版 MultiStomp（MS-50G / MS-60B / MS-70CDR），不支持 "+" 系列和 Four 系列。');
     lines.push('先备份踏板。每个 capture 占 194 DSP，多个同时开通常装不下。');
     lines.push('');
-    lines.push('槽位\tZDL\t踏板显示\t短名\t源文件');
+    lines.push('槽位\tZDL\t踏板显示\t短名\t封面\t源文件');
     for (const r of state.results) {
-      lines.push(`${r.report.slot}\t${r.report.filename}\t${r.report.displayName}\t${r.report.shortName}\t${r.report.sourceFile}`);
+      lines.push(`${r.report.slot}\t${r.report.filename}\t${r.report.displayName}\t${r.report.shortName}\t${r.report.coverName || '默认'}\t${r.report.sourceFile}`);
     }
     lines.push('');
     lines.push('重复安装同一槽位会替换该 capture，所有用到它的 patch 都会变。');
@@ -1958,19 +2352,21 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     const body = $('#zdlBody');
     if (!body) return;
     if (!state.zdlFiles.length) {
-      body.innerHTML = '<tr class="empty-row"><td colspan="6">NO ZDL — DROP FILES ABOVE</td></tr>';
+      body.innerHTML = '<tr class="empty-row"><td colspan="7">NO ZDL — DROP FILES ABOVE</td></tr>';
       updateRecoverButtons(); redrawPedalPreview(); return;
     }
     body.innerHTML = state.zdlFiles.map(e => {
       const pills = { wait: ['status-wait', 'WAIT'], ready: ['status-ready', 'READY'], applied: ['status-done', 'APPLIED'], done: ['status-done', 'DONE'], error: ['status-error', 'ERR'] };
       const [cls, label] = pills[e.status] || pills.wait;
       const bad = e.status !== 'error' && !validZdlName(e.name) ? ' is-bad' : '';
+      const over = coverOverInfo(e);
       return `<tr data-id="${e.id}">
         <td><div class="file-cell"><b title="${esc(e.file.name)}">${esc(e.file.name)}</b><span>${e.error ? esc(e.error) : `引擎 ${esc(e.version)} · ${fmtBytes(e.bytes?.length || 0)}`}</span></div></td>
         <td><span class="status-pill ${cls}">${label}</span></td>
         <td><span class="display-name">${e.slot ? `#${e.slot}` : '—'} · ${e.fxid || '—'}</span></td>
         <td><input class="cell-input${bad}" data-edit="zname" value="${esc(e.name)}" maxlength="8" spellcheck="false" ${e.status === 'done' ? 'disabled' : ''}></td>
-        <td><canvas class="row-cover" data-cover-id="${e.id}" width="128" height="64"></canvas></td>
+        <td><button class="row-cover-btn${over.isSet ? '' : ' is-follow'}${over.isOver ? ' is-over' : ''}" type="button" data-cover-id="${e.id}" data-cover-kind="zdl" title="点击单独选择封面"><canvas class="row-cover" width="128" height="64"></canvas></button>
+          <span class="row-cover-badge ${over.isOver ? 'is-over' : over.isSet ? 'is-set' : 'is-follow'}">${esc(over.text)}</span></td>
         <td><button class="icon-btn" data-remove="zdl" title="移除">✕</button></td>
       </tr>`;
     }).join('');
@@ -1978,13 +2374,28 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     updateRecoverButtons();
     redrawPedalPreview();
   }
+  function coverOverInfo(e) {
+    if (!e.coverOverride) return { isSet: false, isOver: false, text: '默认' };
+    const layer = resolveCoverLayer(e.coverOverride);
+    const pixels = renderCoverPixels(layer.design, (e.shortName || e.name || 'AC30C'));
+    const isOver = rleLength(pixels) > PIC_CAP;
+    return { isSet: true, isOver, text: isOver ? '超出 1024 B' : layer.label };
+  }
   function renderRowCovers() {
-    for (const cv of $$('.row-cover')) {
-      const e = state.zdlFiles.find(x => x.id === Number(cv.dataset.coverId));
+    for (const btn of $$('[data-cover-kind]')) {
+      const e = [...state.files, ...state.zdlFiles].find(x => x.id === Number(btn.dataset.coverId));
       if (!e) continue;
-      const name = e.status === 'error' ? 'ERR' : e.name;
-      paintMini(cv, renderCoverPixels(design, name));
-      cv.style.width = '92px'; cv.style.height = '46px'; cv.style.imageRendering = 'pixelated'; cv.style.borderRadius = '5px';
+      const name = e.status === 'error' ? 'ERR' : (e.shortName || e.name || 'AC30C');
+      const cv = btn.querySelector('canvas');
+      if (cv) paintMini(cv, coverPixelsFor(name, e.coverOverride));
+      const over = coverOverInfo(e);
+      btn.classList.toggle('is-follow', !over.isSet);
+      btn.classList.toggle('is-over', over.isOver);
+      const badge = btn.parentElement.querySelector('.row-cover-badge');
+      if (badge) {
+        badge.textContent = over.text;
+        badge.className = 'row-cover-badge ' + (over.isOver ? 'is-over' : over.isSet ? 'is-set' : 'is-follow');
+      }
     }
   }
   function updateRecoverButtons() {
@@ -2001,14 +2412,14 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
       e.error = '';
       try {
         if (!validZdlName(e.name)) throw new Error('显示名需以字母开头，1–8 位字母/数字/连字符');
-        const pixels = renderCoverPixels(design, e.name);
+        const pixels = coverPixelsFor(e.name, e.coverOverride);
         if (rleLength(pixels) > PIC_CAP) throw new Error('封面数据超过 1024 B');
         const out = new Uint8Array(e.bytes);
         out.set(CoverArt.picture({ capacity: PIC_CAP }, pixels), e.meta.picture_offset);
         const display = NAMLoader.pedalName(e.name);
         out.fill(0, e.meta.name_offset, e.meta.name_offset + 12);
         out.set(new TextEncoder().encode(display), e.meta.name_offset);
-        state.zdlResults.push({ entry: e, bytes: out, png: null, pixels, display });
+        state.zdlResults.push({ entry: e, bytes: out, png: null, pixels, display, coverLabel: coverLabelFor(e.coverOverride) });
         e.status = 'applied';
       } catch (err) {
         e.status = 'ready';
@@ -2039,7 +2450,7 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
       files.push({ name: r.entry.file.name, data: r.bytes });
       if (r.png) files.push({ name: base + '.png', data: r.png });
     }
-    files.push({ name: 'README.txt', data: new TextEncoder().encode('﻿NAM FORGE 换封面导出\r\n引擎: ' + ENGINE_VERSION + '\r\n封面: ' + (PRESETS[design.preset]?.label || '自定义') + '\r\n\r\n只改写封面区和显示名，音色权重未改动。\r\n安装前请备份踏板；ZDL 与同名 PNG 放在一起。\r\n') });
+    files.push({ name: 'README.txt', data: new TextEncoder().encode('﻿NAM FORGE 换封面导出\r\n引擎: ' + ENGINE_VERSION + '\r\n默认封面: ' + (PRESETS[design.preset]?.label || '自定义') + '\r\n' + state.zdlResults.map(r => `${r.entry.file.name}\t封面: ${r.coverLabel || '默认'}`).join('\r\n') + '\r\n\r\n只改写封面区和显示名，音色权重未改动。\r\n安装前请备份踏板；ZDL 与同名 PNG 放在一起。\r\n') });
     files.push({ name: 'NOTICE.txt', data: new TextEncoder().encode(ENGINE_DATA.notice || '') });
     return makeZip(files);
   }
@@ -2146,12 +2557,29 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     $('#namInput').addEventListener('change', ev => { addNamFiles(ev.target.files); ev.target.value = ''; });
     $('#zdlInput').addEventListener('change', ev => { addZdlFiles(ev.target.files); ev.target.value = ''; });
 
-    // Cover selects
+    // Cover selects (default cover)
     const options = Object.entries(PRESETS).map(([id, p]) => `<option value="${id}">${esc(p.label)}</option>`).join('') + '<option value="custom">自定义（当前编辑）</option>';
     for (const sel of [$('#coverSelect'), $('#recoverCoverSelect')]) {
       sel.innerHTML = options;
       sel.addEventListener('change', () => { if (sel.value !== 'custom') applyPreset(sel.value); });
     }
+
+    // Per-file cover pickers and "apply default" buttons
+    for (const [body, kind] of [[$('#namBody'), 'nam'], [$('#zdlBody'), 'zdl']]) {
+      body.addEventListener('click', ev => {
+        const btn = ev.target.closest('[data-cover-kind]');
+        if (!btn) return;
+        ev.stopPropagation();
+        openCoverPicker(btn, btn.dataset.coverKind, Number(btn.dataset.coverId));
+      });
+    }
+    $('#batchResetCoversBtn').addEventListener('click', () => resetEntryCovers('nam'));
+    $('#recoverResetCoversBtn').addEventListener('click', () => resetEntryCovers('zdl'));
+
+    // Cover library
+    $('#saveCoverBtn').addEventListener('click', () => saveCurrentCover(false));
+    $('#saveCoverAsBtn').addEventListener('click', () => saveCurrentCover(true));
+    $('#coverSaveName').addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); saveCurrentCover(false); } });
 
     // Plate / halo toggles
     for (const id of ['#showNameToggle', '#showNameToggle2', '#recoverShowNameToggle']) {
@@ -2319,6 +2747,7 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     }
     $('#engineVersion').textContent = ENGINE_VERSION;
     buildPresetGallery();
+    renderCoverLib();
     initControls();
     resetHistory();
     redrawAll();

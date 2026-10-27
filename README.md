@@ -36,9 +36,11 @@ First example source (`covers/ac30c-tree.png`): Bilibili [@__米粥__, “这个
 ## Features
 
 - **Batch conversion** — drop multiple `.nam` files; the app detects A2 Lite models (3-channel WaveNet inside a SlimmableContainer), assigns short names and slots, and exports a ZIP with `.ZDL` + matching `.png` + `.json` notes.
-- **Re-cover** — drop existing `.ZDL` files; only the 1,024 B picture area and 12 B display name are rewritten. Weights, FXID and version are left untouched (byte-diff verified).
+- **Cover library** — save multiple edited covers from the Cover designer (stored in this browser's localStorage). In the Batch and Re-cover tables, click a row's cover thumbnail to pick a cover just for that file (library, built-in preset, or the current edit); one button resets everything to the default cover.
+- **Re-cover** — drop existing `.ZDL` files; only the 1,024 B picture area and 12 B display name are rewritten. Weights, FXID and version are left untouched (byte-diff verified). Each file can use its own cover.
 - **Cover designer** — 128×64 1-bit; default “plain text on light” with 1 px small text; presets, freehand drawing, invert, clear. The “original pedal” preset draws no name by default; enable “show name” if you want it.
-- **Image import** — half-solid / half-dither hybrid (default, dot amount adjustable), pure dither, solid, or line/edge mode; scale 25–400%, X/Y offset, or drag with the Move tool.
+- **Image import** — half-solid / half-dither hybrid (default, dot amount adjustable), pure dither, solid, or line/edge mode; scale 25–400%, X/Y offset, or drag with the Move tool. Artwork is fitted to the pedal's display shape (LCD pixels are 1.4× taller than wide), so it is not stretched on the ZDL.
+- **What you see is what you get** — editor, pedal previews, thumbnails and the exported PNG all use the pedal's real 1.4× shape.
 - **Text** — show/hide, small 1 px or large, X/Y offset or drag with the Move-text tool; optional plate and outline.
 - **Import / export** — export the cover as a 128×64 PNG; export/import the full design as JSON (bitmap + text position/size/toggles), so you can continue on another machine.
 - Engine **0.26**, **216** capture slots, **194 DSP** per full-rate capture.
@@ -59,7 +61,7 @@ First example source (`covers/ac30c-tree.png`): Bilibili [@__米粥__, “这个
 ## Re-cover
 
 1. **Re-cover** → drop existing `.ZDL` files (0.26 templates).
-2. Edit the display name and pick a cover; click **Apply cover**.
+2. Edit the display name; click a row's cover thumbnail to pick a cover for that file, then **Apply cover**.
 3. Only the cover area and display name change; the amp model data is untouched.
 
 ## Install on the pedal
