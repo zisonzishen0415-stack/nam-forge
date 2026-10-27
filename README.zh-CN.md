@@ -30,7 +30,7 @@
   <img src="covers/ac30c-wave.png" width="320" alt="AC30C 波纹">
 </p>
 
-图源：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)。原图版权归原作者，这里仅作 NAM FORGE 的 1-bit 导入效果展示，未经原作者许可请勿商用。
+第一张示例（`covers/ac30c-tree.png`）图源：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)。原图版权归原作者，仅作 NAM FORGE 的 1-bit 导入效果展示，未经原作者许可请勿商用；其余示例由用户提供。
 
 ## 功能
 
@@ -83,7 +83,7 @@
 - **NAM 格式**：[NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore)（Steven Atkinson，MIT）。
 - **字体**：[JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)（SIL Open Font License 1.1），已嵌入页面；许可见 `FONT-LICENSE.txt`。
 - **安装工具**：Zoom Effect Manager（第三方，不随本项目分发）。
-- **封面作品原图**：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)（版权归原作者，仅作 1-bit 导入效果展示）。
+- **封面作品原图（第一张示例 `covers/ac30c-tree.png`）**：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)（版权归原作者，仅作 1-bit 导入效果展示）。
 
 第三方声明与完整 MIT / OFL 文本见 `NOTICE.txt`、`FONT-LICENSE.txt`。
 

@@ -31,7 +31,7 @@ Examples made by importing artwork into NAM FORGE (sample short name `AC30C`):
   <img src="covers/ac30c-wave.png" width="320" alt="AC30C wave cover">
 </p>
 
-Artwork source: Bilibili [@__米粥__, “这个月的一些零图” (Some sketches from this month)](https://www.bilibili.com/opus/1208525001677864960). Copyright belongs to the original artist. Shown here only as 1-bit import examples; do not use commercially without the artist's permission.
+First example source (`covers/ac30c-tree.png`): Bilibili [@__米粥__, “这个月的一些零图” (Some sketches from this month)](https://www.bilibili.com/opus/1208525001677864960). Copyright belongs to the original artist; shown only as a 1-bit import example. Do not use commercially without the artist's permission. The other examples are user-supplied.
 
 ## Features
 
@@ -84,7 +84,7 @@ Artwork source: Bilibili [@__米粥__, “这个月的一些零图” (Some sket
 - **NAM format**: [NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore) (Steven Atkinson, MIT).
 - **Font**: [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) (SIL Open Font License 1.1), embedded in the page; see `FONT-LICENSE.txt`.
 - **Installer**: Zoom Effect Manager (third-party; not bundled).
-- **Cover artwork source**: Bilibili [@__米粥__](https://www.bilibili.com/opus/1208525001677864960) (copyright belongs to the original artist; shown only as 1-bit import examples).
+- **Cover artwork source (first example, `covers/ac30c-tree.png`)**: Bilibili [@__米粥__](https://www.bilibili.com/opus/1208525001677864960) (copyright belongs to the original artist; shown only as a 1-bit import example).
 
 Third-party notices and the full MIT/OFL texts are in `NOTICE.txt` and `FONT-LICENSE.txt`.
 
