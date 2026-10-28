@@ -18,20 +18,6 @@
 - **NAM / Neural Amp Modeler**：A2 Lite 捕捉（`.nam`，SlimmableContainer，3 声道 WaveNet）。
 - **输出**：`.ZDL`，用 **Zoom Effect Manager 2.3.3+** 安装。
 
-## 封面作品
-
-用「导入图片」把原图转成 128×64 踏板封面的效果（示例短名 `AC30C`）：
-
-<p align="center">
-  <img src="covers/ac30c-tree.png" width="320" alt="AC30C 树">
-  <img src="covers/ac30c-face.png" width="320" alt="AC30C 人像">
-  <br>
-  <img src="covers/ac30c-skull.png" width="320" alt="AC30C 骷髅">
-  <img src="covers/ac30c-wave.png" width="320" alt="AC30C 波纹">
-</p>
-
-第一张示例（`covers/ac30c-tree.png`）图源：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)。原图版权归原作者，仅作 NAM FORGE 的 1-bit 导入效果展示，未经原作者许可请勿商用；其余示例由用户提供。
-
 ## 共享封面库
 
 在 [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/) 浏览/下载别人分享的封面：下载 design JSON 后，在 App 里用「封面设计 → 导入设计」导入。投稿走 GitHub Issue，审核后进入共享库。
@@ -89,7 +75,6 @@
 - **NAM 格式**：[NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore)（Steven Atkinson，MIT）。
 - **字体**：[JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)（SIL Open Font License 1.1），已嵌入页面；许可见 `FONT-LICENSE.txt`。
 - **安装工具**：Zoom Effect Manager（第三方，不随本项目分发）。
-- **封面作品原图（第一张示例 `covers/ac30c-tree.png`）**：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)（版权归原作者，仅作 1-bit 导入效果展示）。
 
 第三方声明与完整 MIT / OFL 文本见 `NOTICE.txt`、`FONT-LICENSE.txt`。
 

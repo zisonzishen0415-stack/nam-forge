@@ -19,20 +19,6 @@ Runs entirely in the browser. Files never leave your machine.
 - **NAM / Neural Amp Modeler**: A2 Lite captures (`.nam`, SlimmableContainer, 3-channel WaveNet).
 - **Output**: `.ZDL` effects for **Zoom Effect Manager 2.3.3+**.
 
-## Cover gallery
-
-Examples made by importing artwork into NAM FORGE (sample short name `AC30C`):
-
-<p align="center">
-  <img src="covers/ac30c-tree.png" width="320" alt="AC30C tree cover">
-  <img src="covers/ac30c-face.png" width="320" alt="AC30C portrait cover">
-  <br>
-  <img src="covers/ac30c-skull.png" width="320" alt="AC30C skull cover">
-  <img src="covers/ac30c-wave.png" width="320" alt="AC30C wave cover">
-</p>
-
-First example source (`covers/ac30c-tree.png`): Bilibili [@__米粥__, “这个月的一些零图” (Some sketches from this month)](https://www.bilibili.com/opus/1208525001677864960). Copyright belongs to the original artist; shown only as a 1-bit import example. Do not use commercially without the artist's permission. The other examples are user-supplied.
-
 ## Shared covers
 
 Browse and submit community covers in [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/). Download a design JSON from the library, then use **封面设计 → 导入设计** in the app. Submissions go through GitHub issues and are reviewed before being added.
@@ -90,7 +76,6 @@ Browse and submit community covers in [NAM FORGE COVERS](https://zisonzishen0415
 - **NAM format**: [NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore) (Steven Atkinson, MIT).
 - **Font**: [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) (SIL Open Font License 1.1), embedded in the page; see `FONT-LICENSE.txt`.
 - **Installer**: Zoom Effect Manager (third-party; not bundled).
-- **Cover artwork source (first example, `covers/ac30c-tree.png`)**: Bilibili [@__米粥__](https://www.bilibili.com/opus/1208525001677864960) (copyright belongs to the original artist; shown only as a 1-bit import example).
 
 Third-party notices and the full MIT/OFL texts are in `NOTICE.txt` and `FONT-LICENSE.txt`.
 
