@@ -397,6 +397,21 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
   .statusbar{font-size:6.5px;gap:6px}
 }
 
+
+/* ---- share to shared library ---- */
+.share-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:18px}
+.share-modal[hidden]{display:none}
+.share-card{width:min(470px,100%);max-height:calc(100vh - 36px);overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:2px;padding:16px;display:flex;flex-direction:column;gap:9px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.share-card h3{margin:0 0 2px;font-size:15px;color:var(--text)}
+.share-card .hint{font-size:9.5px;color:var(--muted);line-height:1.55}
+.share-card label{display:flex;flex-direction:column;gap:3px;font-size:9.5px;letter-spacing:.04em;color:var(--subtle)}
+.share-card input,.share-card select{background:var(--base);border:1px solid var(--muted);border-radius:2px;padding:6px 7px;color:var(--text);font:400 11px var(--mono);outline:none}
+.share-card input:focus,.share-card select:focus{border-color:var(--blue)}
+.share-check{flex-direction:row!important;align-items:center;gap:6px!important;color:var(--subtle)}
+.share-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:2px}
+#shareStatus{font-size:9.5px;color:var(--muted);min-height:1.4em;margin:0}
+#shareStatus.err{color:var(--red)}
+.share-card code{font-family:var(--mono);color:var(--amber)}
 </style>
 </head>
 <body>
@@ -549,6 +564,7 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
             <input id="designInput" type="file" accept=".json,application/json" hidden>
             <button class="btn" id="exportDesignBtn">导出设计</button>
             <button class="btn" id="exportCoverBtn">导出封面</button>
+            <button class="btn primary" id="shareCoverBtn">分享到共享库</button>
             <button class="btn" id="undoBtn" disabled>撤销</button>
             <button class="btn" id="redoBtn" disabled>重做</button>
           </div>
@@ -675,6 +691,23 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
     <span>MIT ENGINE · OFL FONT</span><span class="sep">|</span>
     <span>NOT AFFILIATED WITH ZOOM</span>
   </footer>
+</div>
+
+
+<div class="share-modal" id="shareModal" hidden>
+  <div class="share-card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+    <h3 id="shareTitle">分享到共享封面库</h3>
+    <p class="hint">只上传你拥有版权或已获授权的封面。design JSON 与 128×64 PNG 会直接提交到公共库。</p>
+    <label>封面名称<input id="shareName" maxlength="40" placeholder="例如 木纹 · AC30"></label>
+    <label>作者<input id="shareAuthor" maxlength="60" placeholder="你的名字 / GitHub ID"></label>
+    <label>许可<select id="shareLicense"><option value="CC-BY-4.0">CC BY 4.0</option><option value="CC0-1.0">CC0 1.0</option><option value="CC-BY-SA-4.0">CC BY-SA 4.0</option><option value="MIT">MIT</option></select></label>
+    <label>来源 / 授权说明<input id="shareSource" maxlength="140" placeholder="original 或原图链接"></label>
+    <label>GitHub token<input id="shareToken" type="password" autocomplete="off" placeholder="github_pat_..."></label>
+    <label class="share-check"><input id="shareRemember" type="checkbox"> 记住 token（仅本机浏览器）</label>
+    <p class="hint">Fine-grained token → 仅选 <code>nam-forge-covers</code> → Contents: Read and write。<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">创建 token ↗</a></p>
+    <p id="shareStatus"></p>
+    <div class="share-actions"><button class="btn small" id="shareCancel" type="button">取消</button><button class="btn primary small" id="shareSubmit" type="button">分享</button></div>
+  </div>
 </div>
 
 <div id="toasts" class="toasts" aria-live="polite"></div>
@@ -2759,9 +2792,135 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
       toast('这个浏览器没有 crypto.subtle，请用 Chrome / Edge 打开', 'bad');
     }
   }
+  window.NAMForgeShareAPI = {
+    getDesign: () => designToJson(design),
+    getPixels: () => renderCoverPixels(design, currentPreviewName()),
+    getName: () => currentPreviewName(),
+    paper: LCD_PAPER,
+    ink: LCD_INK,
+    toast: (m, t) => toast(m, t)
+  };
   boot();
 })();
 
 </script>
+
+<script>
+'use strict';
+(() => {
+  const API = window.NAMForgeShareAPI;
+  const modal = document.getElementById('shareModal');
+  const btn = document.getElementById('shareCoverBtn');
+  if (!API || !modal || !btn) return;
+  const $ = id => document.getElementById(id);
+  const status = $('shareStatus');
+  const OWNER = 'zisonzishen0415-stack', REPO = 'nam-forge-covers', BRANCH = 'main';
+  const API_BASE = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
+  const TOKEN_KEY = 'namforge-gh-token', AUTHOR_KEY = 'namforge-gh-author';
+  const setStatus = (msg, err) => { status.textContent = msg; status.className = err ? 'err' : ''; };
+  const b64 = bytes => { let s = ''; const CH = 0x8000; for (let i = 0; i < bytes.length; i += CH) s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH)); return btoa(s); };
+  const textB64 = s => b64(new TextEncoder().encode(s));
+  const slug = s => String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32) || 'cover';
+  async function gh(path, opts = {}) {
+    const token = $('shareToken').value.trim();
+    const res = await fetch(API_BASE + path, {
+      ...opts,
+      headers: {
+        Authorization: 'Bearer ' + token,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(opts.headers || {})
+      }
+    });
+    if (!res.ok) {
+      let msg = res.status;
+      try { const j = await res.json(); msg = j.message || msg; } catch {}
+      throw new Error(msg + ' (HTTP ' + res.status + ')');
+    }
+    return res.json();
+  }
+  function previewBlob() {
+    const pixels = API.getPixels();
+    const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64;
+    const g = cv.getContext('2d');
+    g.fillStyle = API.paper; g.fillRect(0, 0, 128, 64);
+    g.fillStyle = API.ink;
+    for (let y = 0; y < 64; y++) for (let x = 0; x < 128; x++) if (pixels[(y << 7) + x]) g.fillRect(x, y, 1, 1);
+    return new Promise(r => cv.toBlob(r, 'image/png'));
+  }
+  async function putFile(path, contentB64, message, sha) {
+    const body = { message, content: contentB64, branch: BRANCH };
+    if (sha) body.sha = sha;
+    return gh('/contents/' + path, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  }
+  async function share() {
+    const token = $('shareToken').value.trim();
+    const name = $('shareName').value.trim();
+    let author = $('shareAuthor').value.trim();
+    const license = $('shareLicense').value;
+    const source = $('shareSource').value.trim() || 'original';
+    if (!token) return setStatus('请填 GitHub token', true);
+    if (!name) return setStatus('请填封面名称', true);
+    $('shareSubmit').disabled = true;
+    setStatus('准备中…');
+    try {
+      if (!author) {
+        try {
+          const u = await fetch('https://api.github.com/user', { headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' } });
+          if (u.ok) author = (await u.json()).login || '';
+        } catch {}
+      }
+      const libRes = await gh('/contents/library.json');
+      const bin = atob(libRes.content.replace(/\s/g, ''));
+      const lib = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+      const baseId = slug(name);
+      let id = baseId, n = 2;
+      while (lib.covers.some(c => c.id === id)) { id = baseId + '-' + n; n++; }
+      const design = { app: 'NAM FORGE', format: 1, engine: '0.26', previewName: API.getName(), design: API.getDesign() };
+      const designText = JSON.stringify(design, null, 2);
+      const png = await previewBlob();
+      const pngBytes = new Uint8Array(await png.arrayBuffer());
+      setStatus('上传 design JSON…');
+      await putFile('covers/' + id + '.json', textB64(designText), 'Add cover ' + name);
+      setStatus('上传 PNG 预览…');
+      await putFile('covers/' + id + '.png', b64(pngBytes), 'Add cover preview ' + name);
+      setStatus('更新 library.json…');
+      lib.updated = new Date().toISOString().slice(0, 10);
+      lib.covers.push({
+        id, name, author: author || 'anonymous', license, source,
+        preview: 'covers/' + id + '.png', design: 'covers/' + id + '.json',
+        tags: ['shared'], added: lib.updated
+      });
+      await putFile('library.json', textB64(JSON.stringify(lib, null, 2)), 'Add cover ' + name, libRes.sha);
+      if ($('shareRemember').checked) {
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(AUTHOR_KEY, author);
+      }
+      setStatus('已上传。Pages 构建约 30 秒后出现在共享库。');
+      API.toast('封面已分享到共享库', 'good');
+      setTimeout(() => window.open('https://zisonzishen0415-stack.github.io/nam-forge-covers/', '_blank', 'noopener'), 900);
+    } catch (e) {
+      setStatus('失败：' + (e.message || e), true);
+    } finally {
+      $('shareSubmit').disabled = false;
+    }
+  }
+  function open() {
+    $('shareName').value = ($('coverSaveName') && $('coverSaveName').value) || API.getName() || 'Cover';
+    $('shareAuthor').value = localStorage.getItem(AUTHOR_KEY) || '';
+    $('shareSource').value = 'original';
+    $('shareToken').value = localStorage.getItem(TOKEN_KEY) || '';
+    $('shareRemember').checked = !!localStorage.getItem(TOKEN_KEY);
+    setStatus('');
+    modal.hidden = false;
+    setTimeout(() => $('shareName').focus(), 50);
+  }
+  btn.addEventListener('click', open);
+  $('shareCancel').addEventListener('click', () => { modal.hidden = true; });
+  $('shareSubmit').addEventListener('click', share);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.hidden = true; });
+})();
+</script>
+
 </body>
 </html>

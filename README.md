@@ -23,6 +23,8 @@ Runs entirely in the browser. Files never leave your machine.
 
 Browse and submit community covers in [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/). Download a design JSON from the library, then use **封面设计 → 导入设计** in the app. Submissions go through GitHub issues and are reviewed before being added.
 
+**Share from the app**: in the cover editor, click **分享到共享库**. A fine-grained GitHub token is needed once (repository access: `nam-forge-covers`; Contents: Read and write). The app writes the design JSON + 128×64 PNG and updates `library.json` directly. The token is stored only in this browser if you tick “remember” — only do this on your own machine.
+
 ## Features
 
 - **Batch conversion** — drop multiple `.nam` files; the app detects A2 Lite models (3-channel WaveNet inside a SlimmableContainer), assigns short names and slots, and exports a ZIP with `.ZDL` + matching `.png` + `.json` notes.

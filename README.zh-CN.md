@@ -22,6 +22,8 @@
 
 在 [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/) 浏览/下载别人分享的封面：下载 design JSON 后，在 App 里用「封面设计 → 导入设计」导入。投稿走 GitHub Issue，审核后进入共享库。
 
+**App 内直接分享**：封面设计 →「分享到共享库」。一次填入 fine-grained token（仅选 `nam-forge-covers`，Contents: Read and write），之后一键把 design JSON + 128×64 PNG 写进库并更新 `library.json`。勾选「记住 token」只存在本机浏览器；只在自己的电脑上这样做。
+
 ## 功能
 
 - **批量转换**：一次拖入多个 `.nam`，自动识别 A2 Lite（SlimmableContainer 内的 3 声道 WaveNet），分配短名和槽位，导出 ZIP（`.ZDL` + 同名 `.png` + `.json`）。
