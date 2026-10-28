@@ -697,14 +697,12 @@ input[type=range]{width:100%;accent-color:var(--foam);background:transparent;hei
 <div class="share-modal" id="shareModal" hidden>
   <div class="share-card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <h3 id="shareTitle">分享到共享封面库</h3>
-    <p class="hint">只上传你拥有版权或已获授权的封面。design JSON 与 128×64 PNG 会直接提交到公共库。</p>
+    <p class="hint">只上传在 NAM FORGE 里设计、且你有权分享的封面。提交后约 30 秒自动出现在公共库，无需导出文件。</p>
     <label>封面名称<input id="shareName" maxlength="40" placeholder="例如 木纹 · AC30"></label>
     <label>作者<input id="shareAuthor" maxlength="60" placeholder="你的名字 / GitHub ID"></label>
     <label>许可<select id="shareLicense"><option value="CC-BY-4.0">CC BY 4.0</option><option value="CC0-1.0">CC0 1.0</option><option value="CC-BY-SA-4.0">CC BY-SA 4.0</option><option value="MIT">MIT</option></select></label>
     <label>来源 / 授权说明<input id="shareSource" maxlength="140" placeholder="original 或原图链接"></label>
-    <label>GitHub token<input id="shareToken" type="password" autocomplete="off" placeholder="github_pat_..."></label>
-    <label class="share-check"><input id="shareRemember" type="checkbox"> 记住 token（仅本机浏览器）</label>
-    <p class="hint">Fine-grained token → 仅选 <code>nam-forge-covers</code> → Contents: Read and write。<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">创建 token ↗</a></p>
+    <p class="hint">点「分享」会打开 GitHub 提交页，再点一次 <strong>Submit new issue</strong> 即可。不需要 token，不需要导出。</p>
     <p id="shareStatus"></p>
     <div class="share-actions"><button class="btn small" id="shareCancel" type="button">取消</button><button class="btn primary small" id="shareSubmit" type="button">分享</button></div>
   </div>
@@ -2814,32 +2812,39 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
   if (!API || !modal || !btn) return;
   const $ = id => document.getElementById(id);
   const status = $('shareStatus');
-  const OWNER = 'zisonzishen0415-stack', REPO = 'nam-forge-covers', BRANCH = 'main';
-  const API_BASE = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
-  const TOKEN_KEY = 'namforge-gh-token', AUTHOR_KEY = 'namforge-gh-author';
+  const OWNER = 'zisonzishen0415-stack', REPO = 'nam-forge-covers';
+  const ISSUE_URL = 'https://github.com/' + OWNER + '/' + REPO + '/issues/new';
+  const AUTHOR_KEY = 'namforge-gh-author';
   const setStatus = (msg, err) => { status.textContent = msg; status.className = err ? 'err' : ''; };
-  const b64 = bytes => { let s = ''; const CH = 0x8000; for (let i = 0; i < bytes.length; i += CH) s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH)); return btoa(s); };
-  const textB64 = s => b64(new TextEncoder().encode(s));
-  const slug = s => String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32) || 'cover';
-  async function gh(path, opts = {}) {
-    const token = $('shareToken').value.trim();
-    const res = await fetch(API_BASE + path, {
-      ...opts,
-      headers: {
-        Authorization: 'Bearer ' + token,
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        ...(opts.headers || {})
-      }
-    });
-    if (!res.ok) {
-      let msg = res.status;
-      try { const j = await res.json(); msg = j.message || msg; } catch {}
-      throw new Error(msg + ' (HTTP ' + res.status + ')');
+  const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  function b64url(bytes) {
+    let out = '';
+    for (let i = 0; i < bytes.length; i += 3) {
+      const a = bytes[i], b = i + 1 < bytes.length ? bytes[i + 1] : 0, c = i + 2 < bytes.length ? bytes[i + 2] : 0;
+      out += B64[a >> 2] + B64[((a & 3) << 4) | (b >> 4)] + (i + 1 < bytes.length ? B64[((b & 15) << 2) | (c >> 6)] : '') + (i + 2 < bytes.length ? B64[c & 63] : '');
     }
-    return res.json();
+    return out;
   }
-  function previewBlob() {
+  function unpackBase(b64) {
+    const bin = atob(b64);
+    const bg = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bg[i] = bin.charCodeAt(i) & 1;
+    const raw = new Uint8Array(1024);
+    for (let yx = 0; yx < 8; yx++) for (let x = 0; x < 128; x++) {
+      let v = 0;
+      for (let z = 0; z < 8; z++) if (bg[((yx * 8 + z) << 7) + x]) v |= 1 << z;
+      raw[yx * 128 + x] = v;
+    }
+    return raw;
+  }
+  async function gzipBytes(bytes) {
+    const cs = new CompressionStream('gzip');
+    const w = cs.writable.getWriter();
+    w.write(bytes); w.close();
+    const ab = await new Response(cs.readable).arrayBuffer();
+    return new Uint8Array(ab);
+  }
+  function previewPng() {
     const pixels = API.getPixels();
     const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64;
     const g = cv.getContext('2d');
@@ -2848,58 +2853,45 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     for (let y = 0; y < 64; y++) for (let x = 0; x < 128; x++) if (pixels[(y << 7) + x]) g.fillRect(x, y, 1, 1);
     return new Promise(r => cv.toBlob(r, 'image/png'));
   }
-  async function putFile(path, contentB64, message, sha) {
-    const body = { message, content: contentB64, branch: BRANCH };
-    if (sha) body.sha = sha;
-    return gh('/contents/' + path, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  }
   async function share() {
-    const token = $('shareToken').value.trim();
     const name = $('shareName').value.trim();
-    let author = $('shareAuthor').value.trim();
+    const author = $('shareAuthor').value.trim();
     const license = $('shareLicense').value;
     const source = $('shareSource').value.trim() || 'original';
-    if (!token) return setStatus('请填 GitHub token', true);
     if (!name) return setStatus('请填封面名称', true);
+    if (!author) return setStatus('请填作者', true);
     $('shareSubmit').disabled = true;
-    setStatus('准备中…');
+    setStatus('打包封面…');
+    const tab = window.open('about:blank', '_blank');
     try {
-      if (!author) {
-        try {
-          const u = await fetch('https://api.github.com/user', { headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' } });
-          if (u.ok) author = (await u.json()).login || '';
-        } catch {}
-      }
-      const libRes = await gh('/contents/library.json');
-      const bin = atob(libRes.content.replace(/\s/g, ''));
-      const lib = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
-      const baseId = slug(name);
-      let id = baseId, n = 2;
-      while (lib.covers.some(c => c.id === id)) { id = baseId + '-' + n; n++; }
-      const design = { app: 'NAM FORGE', format: 1, engine: '0.26', previewName: API.getName(), design: API.getDesign() };
-      const designText = JSON.stringify(design, null, 2);
-      const png = await previewBlob();
-      const pngBytes = new Uint8Array(await png.arrayBuffer());
-      setStatus('上传 design JSON…');
-      await putFile('covers/' + id + '.json', textB64(designText), 'Add cover ' + name);
-      setStatus('上传 PNG 预览…');
-      await putFile('covers/' + id + '.png', b64(pngBytes), 'Add cover preview ' + name);
-      setStatus('更新 library.json…');
-      lib.updated = new Date().toISOString().slice(0, 10);
-      lib.covers.push({
-        id, name, author: author || 'anonymous', license, source,
-        preview: 'covers/' + id + '.png', design: 'covers/' + id + '.json',
-        tags: ['shared'], added: lib.updated
-      });
-      await putFile('library.json', textB64(JSON.stringify(lib, null, 2)), 'Add cover ' + name, libRes.sha);
-      if ($('shareRemember').checked) {
-        localStorage.setItem(TOKEN_KEY, token);
-        localStorage.setItem(AUTHOR_KEY, author);
-      }
-      setStatus('已上传。Pages 构建约 30 秒后出现在共享库。');
-      API.toast('封面已分享到共享库', 'good');
-      setTimeout(() => window.open('https://zisonzishen0415-stack.github.io/nam-forge-covers/', '_blank', 'noopener'), 900);
+      const design = API.getDesign();
+      const base = design.base;
+      delete design.base;
+      const raw = unpackBase(base);
+      const png = await previewPng();
+      const canGzip = 'CompressionStream' in window;
+      const payload = {
+        v: 1, format: 1, engine: '0.26', enc: canGzip ? 'gzip' : 'raw',
+        previewName: String(API.getName() || '').slice(0, 16),
+        name, author, license, source,
+        design,
+        basePacked: b64url(raw),
+        png: b64url(new Uint8Array(await png.arrayBuffer()))
+      };
+      const jsonBytes = new TextEncoder().encode(JSON.stringify(payload));
+      const packed = canGzip ? await gzipBytes(jsonBytes) : jsonBytes;
+      const token = b64url(packed);
+      const body = '### 共享封面投稿\n\n'
+        + '- 名称: ' + name + '\n- 作者: ' + author + '\n- 许可: ' + license + '\n- 来源: ' + source + '\n\n'
+        + '由 NAM FORGE 自动生成。提交后由 Action 自动收录，请勿编辑下面的数据。\n\n'
+        + '<!-- NAMFORGE-COVER:' + token + ' -->';
+      const url = ISSUE_URL + '?' + new URLSearchParams({ title: '[Cover] ' + name, body, labels: 'submission' }).toString();
+      if (tab) tab.location.href = url;
+      localStorage.setItem(AUTHOR_KEY, author);
+      setStatus(tab ? '已打开 GitHub。点一次 Submit new issue 即可，无需 token。' : '弹窗被拦截，请允许弹窗后重试。', !tab);
+      if (tab) API.toast('已打开 GitHub 提交页', 'good');
     } catch (e) {
+      if (tab) tab.close();
       setStatus('失败：' + (e.message || e), true);
     } finally {
       $('shareSubmit').disabled = false;
@@ -2909,8 +2901,6 @@ if(typeof module!=='undefined')module.exports=api;else root.NAMLoader=api;
     $('shareName').value = ($('coverSaveName') && $('coverSaveName').value) || API.getName() || 'Cover';
     $('shareAuthor').value = localStorage.getItem(AUTHOR_KEY) || '';
     $('shareSource').value = 'original';
-    $('shareToken').value = localStorage.getItem(TOKEN_KEY) || '';
-    $('shareRemember').checked = !!localStorage.getItem(TOKEN_KEY);
     setStatus('');
     modal.hidden = false;
     setTimeout(() => $('shareName').focus(), 50);

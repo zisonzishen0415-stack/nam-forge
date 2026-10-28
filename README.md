@@ -21,9 +21,9 @@ Runs entirely in the browser. Files never leave your machine.
 
 ## Shared covers
 
-Browse and submit community covers in [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/). Download a design JSON from the library, then use **封面设计 → 导入设计** in the app. Submissions go through GitHub issues and are reviewed before being added.
+Browse community covers in [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/). Download a design JSON from the library, then use **封面设计 → 导入设计** in the app.
 
-**Share from the app**: in the cover editor, click **分享到共享库**. A fine-grained GitHub token is needed once (repository access: `nam-forge-covers`; Contents: Read and write). The app writes the design JSON + 128×64 PNG and updates `library.json` directly. The token is stored only in this browser if you tick “remember” — only do this on your own machine.
+**Share from the app**: in the cover editor, click **分享到共享库**, fill in name/author/license/source and click **分享**. The app packs the design into a prefilled GitHub issue; click **Submit new issue** once. No token and no exports. A GitHub Action validates it and adds the design JSON + 128×64 PNG to `library.json` automatically.
 
 ## Features
 

@@ -20,9 +20,9 @@
 
 ## 共享封面库
 
-在 [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/) 浏览/下载别人分享的封面：下载 design JSON 后，在 App 里用「封面设计 → 导入设计」导入。投稿走 GitHub Issue，审核后进入共享库。
+在 [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/) 浏览/下载别人分享的封面：下载 design JSON 后，在 App 里用「封面设计 → 导入设计」导入。
 
-**App 内直接分享**：封面设计 →「分享到共享库」。一次填入 fine-grained token（仅选 `nam-forge-covers`，Contents: Read and write），之后一键把 design JSON + 128×64 PNG 写进库并更新 `library.json`。勾选「记住 token」只存在本机浏览器；只在自己的电脑上这样做。
+**App 内直接分享**：封面设计 →「分享到共享库」，填名称/作者/许可/来源，点「分享」。App 会把设计打包成一个预填好的 GitHub issue，再点一次 **Submit new issue** 即可。不需要 token，也不需要导出文件；GitHub Action 会自动把 design JSON + 128×64 PNG 写进 `library.json`。
 
 ## 功能
 
