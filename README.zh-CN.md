@@ -32,6 +32,10 @@
 
 第一张示例（`covers/ac30c-tree.png`）图源：Bilibili [@__米粥__《这个月的一些零图》](https://www.bilibili.com/opus/1208525001677864960)。原图版权归原作者，仅作 NAM FORGE 的 1-bit 导入效果展示，未经原作者许可请勿商用；其余示例由用户提供。
 
+## 共享封面库
+
+在 [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/) 浏览/下载别人分享的封面：下载 design JSON 后，在 App 里用「封面设计 → 导入设计」导入。投稿走 GitHub Issue，审核后进入共享库。
+
 ## 功能
 
 - **批量转换**：一次拖入多个 `.nam`，自动识别 A2 Lite（SlimmableContainer 内的 3 声道 WaveNet），分配短名和槽位，导出 ZIP（`.ZDL` + 同名 `.png` + `.json`）。

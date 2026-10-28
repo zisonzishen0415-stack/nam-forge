@@ -33,6 +33,10 @@ Examples made by importing artwork into NAM FORGE (sample short name `AC30C`):
 
 First example source (`covers/ac30c-tree.png`): Bilibili [@__米粥__, “这个月的一些零图” (Some sketches from this month)](https://www.bilibili.com/opus/1208525001677864960). Copyright belongs to the original artist; shown only as a 1-bit import example. Do not use commercially without the artist's permission. The other examples are user-supplied.
 
+## Shared covers
+
+Browse and submit community covers in [NAM FORGE COVERS](https://zisonzishen0415-stack.github.io/nam-forge-covers/). Download a design JSON from the library, then use **封面设计 → 导入设计** in the app. Submissions go through GitHub issues and are reviewed before being added.
+
 ## Features
 
 - **Batch conversion** — drop multiple `.nam` files; the app detects A2 Lite models (3-channel WaveNet inside a SlimmableContainer), assigns short names and slots, and exports a ZIP with `.ZDL` + matching `.png` + `.json` notes.
